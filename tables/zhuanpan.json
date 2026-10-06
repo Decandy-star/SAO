@@ -1,0 +1,43 @@
+{
+  "_说明": [
+    "大厅「梦幻转盘」配置。假服无原厂奖池表，这里手配；客户端面板打开时 C2S 4601（首次）/ 4605（已有缓存）→ 回 S2C 5101 基础信息。",
+    "normalAwards 必须恰好 8 个槽位（pos 1..8）：客户端按 pos 去预制件子物件 FindChild，缺一个不崩但槽位空、多一个会 NRE。weight 只影响服务端抽奖，客户端不读。",
+    "specialAwards 的 pos 客户端只认 2 与 6（各写一个倍率标签），命中该槽时 jinBi/zuanShi 乘以 backRate。",
+    "tokenItem 用 GoodsList.txt 里的代币 ori；玩家代币够时优先扣代币，否则扣钻石（与客户端价签显示口径一致）。",
+    "endTime 留空则由 durationDays 现算（今天 + N 天 23:59:59），格式必须 yyyy-MM-dd HH:mm:ss，否则客户端 ParseExact 抛异常。",
+    "抽到什么属于「需抓真服包才能定论」的数值，见 docs/PROTOCOL_GAP_REPORT.md §7。"
+  ],
+  "enabled": true,
+  "zuanShiOneCost": 50,
+  "zuanShiTenCost": 450,
+  "tokenItem": "MHZP01",
+  "tokenOneCost": 1,
+  "tokenTenCost": 10,
+  "zuanShiTurnModifier": 1.0,
+  "durationDays": 7,
+  "curAwardPool": 0,
+  "topAwards": [
+    {
+      "jinBi": 0,
+      "zuanShi": 0,
+      "timeReq": 0,
+      "goodsItems": [
+        {"oriName": "GOODS104", "count": 1, "star": 4}
+      ]
+    }
+  ],
+  "normalAwards": [
+    {"pos": 1, "oriName": "", "count": 0, "star": 0, "zuanShi": 0, "jinBi": 20000, "weight": 26},
+    {"pos": 2, "oriName": "", "count": 0, "star": 0, "zuanShi": 0, "jinBi": 50000, "weight": 18},
+    {"pos": 3, "oriName": "SP048", "count": 1, "star": 0, "zuanShi": 0, "jinBi": 0, "weight": 20},
+    {"pos": 4, "oriName": "", "count": 0, "star": 0, "zuanShi": 20, "jinBi": 0, "weight": 14},
+    {"pos": 5, "oriName": "GOODS104", "count": 1, "star": 0, "zuanShi": 0, "jinBi": 0, "weight": 10},
+    {"pos": 6, "oriName": "", "count": 0, "star": 0, "zuanShi": 0, "jinBi": 80000, "weight": 6},
+    {"pos": 7, "oriName": "", "count": 0, "star": 0, "zuanShi": 88, "jinBi": 0, "weight": 4},
+    {"pos": 8, "oriName": "GOODS104", "count": 1, "star": 4, "zuanShi": 0, "jinBi": 0, "weight": 2}
+  ],
+  "specialAwards": [
+    {"pos": 2, "backRate": 2.0},
+    {"pos": 6, "backRate": 1.5}
+  ]
+}

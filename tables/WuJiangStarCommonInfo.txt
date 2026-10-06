@@ -1,0 +1,10 @@
+10	2
+
+eff_ui_shengli
+eff_ui_shengli
+
+XinXinPoSui	huangxing_posui_	huangxing_posui_00009	15
+XinXinPoSui	lanxing_hecheng_	lanxing_hecheng_00012	20
+
+JiChuTuBiao_New_1	zhandoushengli_xingxing	JiChuTuBiao_New_1	zhandoushengli_di
+WuPinTuBiao_linshi2	zixinxin01	WuPinTuBiao_linshi2	zixinxin02

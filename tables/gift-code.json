@@ -1,0 +1,35 @@
+{
+  "_comment": "礼包码 / 激活码。对应协议 C2S 20(请求礼包码) -> S2C 20(结果)、C2S 30(提交激活码) -> S2C 22(仅失败)。enableLibaoMa=false 或 giftCodes 为空时，登录包 detail field 86 下发 false，客户端用户中心里的『礼包码』按钮直接隐藏。",
+  "enableLibaoMa": true,
+  "promptActivationOnLogin": true,
+  "giftCodes": [
+    {
+      "key": "SAO2024",
+      "oncePerAccount": true,
+      "expiresAt": "",
+      "reward": {
+        "gold": 50000,
+        "diamond": 500,
+        "stamina": 60,
+        "wannengFragments": 0,
+        "goods": [
+          { "ori": "GOODS3", "count": 2 }
+        ]
+      }
+    }
+  ],
+  "activationCodes": [
+    {
+      "code": "SAOACTIV8888",
+      "oncePerAccount": true,
+      "expiresAt": "",
+      "reward": {
+        "gold": 100000,
+        "diamond": 2000,
+        "stamina": 120,
+        "wannengFragments": 0,
+        "goods": []
+      }
+    }
+  ]
+}

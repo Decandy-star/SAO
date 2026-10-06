@@ -1,0 +1,58 @@
+{
+  "_说明": "看板 type23。材料=GoodsList WZDH。圣诞快乐=WZDH01–04；新春大吉=WZDH09–12。产品规划：固定档、低档给量多高档给量少。主线 region≥1000 胜/扫荡 1/4 掉这八字之一，不含喜迎元旦/欢闹宵等。改后重启假服。",
+  "tabs": [
+    {
+      "subID": 1,
+      "title": "圣诞兑换",
+      "desc": "集齐「圣诞快乐」四字兑换。主线关卡有机会掉单字。",
+      "rows": [
+        { "id": 1, "getOri": "GOODS117", "getCount": 5, "materials": [
+          { "ori": "WZDH01", "count": 1 }, { "ori": "WZDH02", "count": 1 }, { "ori": "WZDH03", "count": 1 }, { "ori": "WZDH04", "count": 1 }
+        ]},
+        { "id": 2, "getOri": "PY001", "getCount": 8, "materials": [
+          { "ori": "WZDH01", "count": 1 }, { "ori": "WZDH02", "count": 1 }, { "ori": "WZDH03", "count": 1 }, { "ori": "WZDH04", "count": 1 }
+        ]},
+        { "id": 3, "getOri": "ZBSX01", "getCount": 20, "materials": [
+          { "ori": "WZDH01", "count": 2 }, { "ori": "WZDH02", "count": 2 }, { "ori": "WZDH03", "count": 2 }, { "ori": "WZDH04", "count": 2 }
+        ]},
+        { "id": 4, "getOri": "JLBS01", "getCount": 12, "materials": [
+          { "ori": "WZDH01", "count": 2 }, { "ori": "WZDH02", "count": 2 }, { "ori": "WZDH03", "count": 2 }, { "ori": "WZDH04", "count": 2 }
+        ]},
+        { "id": 5, "getOri": "TS101", "getCount": 2, "materials": [
+          { "ori": "WZDH01", "count": 3 }, { "ori": "WZDH02", "count": 3 }, { "ori": "WZDH03", "count": 3 }, { "ori": "WZDH04", "count": 3 }
+        ]},
+        { "id": 6, "getOri": "BX238", "getCount": 1, "materials": [
+          { "ori": "WZDH01", "count": 5 }, { "ori": "WZDH02", "count": 5 }, { "ori": "WZDH03", "count": 5 }, { "ori": "WZDH04", "count": 5 }
+        ]}
+      ]
+    },
+    {
+      "subID": 2,
+      "title": "新年兑换",
+      "desc": "集齐「新春大吉」四字兑换福袋与养成。",
+      "rows": [
+        { "id": 1, "getOri": "BX230", "getCount": 1, "materials": [
+          { "ori": "WZDH09", "count": 1 }, { "ori": "WZDH10", "count": 1 }, { "ori": "WZDH11", "count": 1 }, { "ori": "WZDH12", "count": 1 }
+        ]},
+        { "id": 2, "getOri": "GOODS117", "getCount": 5, "materials": [
+          { "ori": "WZDH09", "count": 1 }, { "ori": "WZDH10", "count": 1 }, { "ori": "WZDH11", "count": 1 }, { "ori": "WZDH12", "count": 1 }
+        ]},
+        { "id": 3, "getOri": "BX231", "getCount": 1, "materials": [
+          { "ori": "WZDH09", "count": 2 }, { "ori": "WZDH10", "count": 2 }, { "ori": "WZDH11", "count": 2 }, { "ori": "WZDH12", "count": 2 }
+        ]},
+        { "id": 4, "getOri": "ZBSX01", "getCount": 20, "materials": [
+          { "ori": "WZDH09", "count": 2 }, { "ori": "WZDH10", "count": 2 }, { "ori": "WZDH11", "count": 2 }, { "ori": "WZDH12", "count": 2 }
+        ]},
+        { "id": 5, "getOri": "BX236", "getCount": 1, "materials": [
+          { "ori": "WZDH09", "count": 3 }, { "ori": "WZDH10", "count": 3 }, { "ori": "WZDH11", "count": 3 }, { "ori": "WZDH12", "count": 3 }
+        ]},
+        { "id": 6, "getOri": "JLBS01", "getCount": 12, "materials": [
+          { "ori": "WZDH09", "count": 3 }, { "ori": "WZDH10", "count": 3 }, { "ori": "WZDH11", "count": 3 }, { "ori": "WZDH12", "count": 3 }
+        ]},
+        { "id": 7, "getOri": "BX237", "getCount": 1, "materials": [
+          { "ori": "WZDH09", "count": 5 }, { "ori": "WZDH10", "count": 5 }, { "ori": "WZDH11", "count": 5 }, { "ori": "WZDH12", "count": 5 }
+        ]}
+      ]
+    }
+  ]
+}

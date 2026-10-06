@@ -1,0 +1,25 @@
+{
+  "_说明": "壕送大礼(type4)档位表 A/B 每日轮换。cycleDays=2：按自然日序号 dayIndex%2 选方案（A 第1天、B 第2天…），0 点切换。每档每天只可领一次。heroFragment=true 表示随机英雄碎片：全服同一份，服务端启动/每天 0 点按当天方案与 minStar 过滤预 roll 一次，存内存 heroFragmentPlan，全服玩家查询展示与领奖发放都用同一碎片（服务端只负责下发）。shining=true 客户端加金光特效。zuanShi/jinbi 直接加钻石/金币。改后重启假服生效。",
+  "cycleDays": 2,
+  "schemes": [
+    {
+      "id": "A",
+      "name": "壕送大礼",
+      "tiers": [
+        { "rmb": 6, "zuanShi": 0, "jinbi": 400000, "items": [ { "ori": "ZBSX01", "count": 20 } ] },
+        { "rmb": 30, "zuanShi": 0, "jinbi": 480000, "items": [ { "ori": "BX128", "count": 2 } ] },
+        { "rmb": 96, "zuanShi": 0, "jinbi": 800000, "items": [ { "heroFragment": true, "count": 15, "shining": true, "minStar": 3 } ] },
+        { "rmb": 200, "zuanShi": 0, "jinbi": 800000, "items": [ { "ori": "TS507", "count": 1, "shining": true }, { "ori": "PY001", "count": 7000 } ] }
+      ]
+    },
+    {
+      "id": "B",
+      "name": "每日充值·魔瓶版",
+      "tiers": [
+        { "rmb": 6, "zuanShi": 0, "jinbi": 0, "items": [ { "ori": "SYMH01", "count": 20 }, { "heroFragment": true, "count": 10 } ] },
+        { "rmb": 30, "zuanShi": 0, "jinbi": 0, "items": [ { "ori": "SYMH01", "count": 40 }, { "heroFragment": true, "count": 15 } ] },
+        { "rmb": 120, "zuanShi": 0, "jinbi": 0, "items": [ { "ori": "SYMH01", "count": 80 }, { "heroFragment": true, "count": 25 } ] }
+      ]
+    }
+  ]
+}

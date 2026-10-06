@@ -1,0 +1,87 @@
+{
+  "_comment": "开服狂欢（7 日狂欢 C2S 5401→S2C 6201 / 半月庆典 5402→6202 / 领取 5403→6203）。",
+  "_comment2": "APK 与假服都【没有】这个活动的数值表：tables 下原本没有任何 kfhappy 配置，ActivitiesStatusInfo 的 23xx 看板也不含它（开服狂欢是大厅独立入口）。",
+  "_comment3": "因此这里全部是产品估的兜底数值，只保证客户端显示与假服入账自洽。",
+  "_comment4": "要逐值对齐真服必须抓包：6201/6202 的 day 条数、每类每档的 jinbi/zuanshi/goodsAward 真实值、YeQian 的 4 个 ID、ActivityEndTime/LingQuEndTime 真实取值、state 是否真的取 {1,2,3}。",
+  "_comment5": "day 规则：7 日档 day=1..7；半月档 day=8..14（客户端 KFHappyMainUI.cs:231-270 只建 8..14 的键，发 15 会 KeyNotFoundException）。",
+  "_comment6": "state 契约（KFHappy_LingQuItem.cs:165-221 / :399-416）：1=条件未达成灰图标可点但只弹提示且不发 5403；2=可领取，点击发 5403，并点亮大厅红点；3=已领取、灰图标、collider 关。不要用 0。",
+  "enabled": true,
+  "dayMultiplier": true,
+  "sevenDayEndDays": 7,
+  "yeQian": [
+    { "id": 1, "name": "每日福利" },
+    { "id": 2, "name": "关卡挑战" },
+    { "id": 3, "name": "等级突破" },
+    { "id": 4, "name": "战力突破" }
+  ],
+  "types": [
+    {
+      "type": 1,
+      "name": "每日福利",
+      "text": "每日登录即可领取",
+      "jinbi": 10000,
+      "zuanshi": 0,
+      "goods": [{ "oriName": "PY001", "count": 2, "stars": 0 }]
+    },
+    {
+      "type": 2,
+      "name": "关卡挑战",
+      "text": "通关指定关卡即可领取",
+      "jinbi": 20000,
+      "zuanshi": 20,
+      "goods": []
+    },
+    {
+      "type": 3,
+      "name": "等级突破",
+      "text": "主角达到指定等级",
+      "jinbi": 20000,
+      "zuanshi": 20,
+      "goods": []
+    },
+    {
+      "type": 4,
+      "name": "星级突破",
+      "text": "武将升至指定星级",
+      "jinbi": 20000,
+      "zuanshi": 20,
+      "goods": []
+    },
+    {
+      "type": 5,
+      "name": "玩法挑战",
+      "text": "参与指定玩法",
+      "jinbi": 20000,
+      "zuanshi": 20,
+      "goods": []
+    },
+    {
+      "type": 6,
+      "name": "半价折扣",
+      "text": "限时半价购买",
+      "jinbi": 0,
+      "zuanshi": 0,
+      "yuanjia": 100,
+      "xianjia": 50,
+      "goods": []
+    },
+    {
+      "type": 7,
+      "name": "战力突破",
+      "text": "战力达到指定值",
+      "jinbi": 20000,
+      "zuanshi": 20,
+      "goods": []
+    },
+    {
+      "type": 8,
+      "name": "物品售卖",
+      "text": "超值礼包限量售卖",
+      "jinbi": 0,
+      "zuanshi": 0,
+      "yuanjia": 200,
+      "xianjia": 100,
+      "goods": []
+    }
+  ]
+}

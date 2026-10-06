@@ -1,0 +1,12 @@
+# ============ 只入库最小可玩集：src / data / tables（外加构建必需的 pom.xml、README） ============
+# 白名单写法：先全忽略，再逐个放行。以后要加目录，就在这里加一行 !/xxx/
+/*
+!/.gitignore
+!/pom.xml
+!/README.md
+!/src/
+!/data/
+!/tables/
+
+# 启动时会自动补齐的 NPC 存档（800 个 / 约 49.5 MB）—— 想一起入库就删掉下面这一行
+/data/players/*.json

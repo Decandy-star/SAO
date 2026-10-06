@@ -1,0 +1,18 @@
+{
+  "_说明": "消耗返利(type6)档位表，每日循环（cycleDays=1 单套）。rmb=当日钻石消耗门槛（EAttriType=18 curDayCostZuanShi），达标即可每天领一次。奖励结构同壕送大礼：zuanShi/jinbi 直接加钻/金币，items.ori=道具 ori（PY001 刷新球、ZBSX01 铸铁、ZBSX02 星陨石）。",
+  "cycleDays": 1,
+  "schemes": [
+    {
+      "id": "cost",
+      "name": "消耗返利",
+      "tiers": [
+        { "rmb": 2000, "zuanShi": 0, "jinbi": 500000, "items": [ { "ori": "PY001", "count": 500 } ] },
+        { "rmb": 5000, "zuanShi": 0, "jinbi": 700000, "items": [ { "ori": "PY001", "count": 800 } ] },
+        { "rmb": 10000, "zuanShi": 0, "jinbi": 1000000, "items": [ { "ori": "PY001", "count": 1000 } ] },
+        { "rmb": 15000, "zuanShi": 0, "jinbi": 1500000, "items": [ { "ori": "ZBSX01", "count": 800 }, { "ori": "PY001", "count": 1200 } ] },
+        { "rmb": 20000, "zuanShi": 0, "jinbi": 2000000, "items": [ { "ori": "ZBSX01", "count": 1500 }, { "ori": "PY001", "count": 1500 } ] },
+        { "rmb": 30000, "zuanShi": 0, "jinbi": 3000000, "items": [ { "ori": "ZBSX02", "count": 200 }, { "ori": "PY001", "count": 1800 } ] }
+      ]
+    }
+  ]
+}

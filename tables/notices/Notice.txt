@@ -1,0 +1,5 @@
+[00ff00]更新公告[-]
+
+登录后的更新公告。改 sao-fake-server/tables/notices/Notice.txt。
+
+对应客户端 NoticeSystem / GengXingGongGao，读 game.cfg 的 NoticeUrl。

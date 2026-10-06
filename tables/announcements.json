@@ -1,0 +1,13 @@
+{
+  "_comment": "系统公告（走马灯）。登录时下发 S2C 30(CCMsg_SysAnnouncement)，一次最多 maxPerLogin 条。type: 0=ALL 1=Sys(走马灯) 2=Chat 3=Chat_Union 4=Chat_Whisper 5=Chat_Laba(大厅喇叭大字)。regionType: 0=ALL 1=MainCity 2=FB 3=KUAFU（客户端只在 regionType≠MainCity 或玩家在主城时入队，建议填 0）。",
+  "maxPerLogin": 3,
+  "announcements": [
+    {
+      "content": "欢迎来到假服测试环境，祝游戏愉快。",
+      "type": 1,
+      "regionType": 0,
+      "level": 0,
+      "contentkey": 0
+    }
+  ]
+}

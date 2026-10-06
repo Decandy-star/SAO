@@ -1,0 +1,43 @@
+{
+  "_说明": "限时神将（大厅独立入口，非活动看板 title）。客户端 XianShiShenJiang / S2C 3702 入口。规则：每天按 heroes 顺序轮换当期神将，长期开放。抽取得文字经验+随机物品；每天 freeTimesPerDay 次免费单抽；某个字经验满激活对应宝箱（0..3 领取 C2S 3304 pos 0-3）；四字全满可领神将（C2S 3304 pos 4；已拥有则按 APK 折算表 WuJiangUpStar「N星英雄折算碎片数」发该将 composeStar 对应的灵魂碎片，索引见 CultivateTables.chaiJieFragForHero，不再走配置项）。改后重启假服生效。",
+  "enabled": true,
+  "activeId": 1,
+  "costOnce": 300,
+  "costTen": 3000,
+  "freeTimesPerDay": 2,
+  "wenZiMaxExp": 100,
+  "expOnceMin": 1,
+  "expOnceMax": 10,
+  "words": ["限", "时", "神", "将"],
+  "desc": "抽取可得文字经验与随机物品。活动期间每天 2 次免费单抽；每次抽取随机获得 1-10 点文字经验。某个字经验条满即可激活对应宝箱；四字全满可领取当期神将；已拥有该英雄则领取时改发该将星级对应的灵魂碎片（WuJiangUpStar 折算表）。",
+  "boxQuality": [5, 4, 4, 3],
+  "_boxes说明": "四格宝箱。ori = 领取时发放的宝箱道具本体（GoodsList BX191-194 七夕神将宝箱一~四，属性 10 可开箱），items = 该箱在背包用 C2S 3101 开启时产出的固定内容。表依据 GoodsList 的 BX 行第 4 列说明：BX191 一定获得史诗勋章x3 / BX192 一定获得影精灵碎片x80 / BX193 一定获得3星蝴蝶翅膀x1 / BX194 一定获得5级红色时光石x2。真服的宝箱抽取库（GoodsList 第 13 列 spec：1:606|1:611|1:612、99999:607~609）在假服 tables\\ 里没有对应表，故只发「一定获得」的固定内容；未登记 items 的箱（其它 BX*）仍走随机池。置空 boxes 数组则回退到 boxQuality 随机 roll（历史兜底，直接发随机物品）。",
+  "boxes": [
+    { "ori": "BX191", "num": 1, "items": [ { "ori": "EQ0044", "num": 3, "stars": 0 } ] },
+    { "ori": "BX192", "num": 1, "items": [ { "ori": "GOODS115", "num": 80, "stars": 0 } ] },
+    { "ori": "BX193", "num": 1, "items": [ { "ori": "EQ0078", "num": 1, "stars": 3 } ] },
+    { "ori": "BX194", "num": 1, "items": [ { "ori": "TS105", "num": 2, "stars": 0 } ] }
+  ],
+  "boxCount": {
+    "3": { "min": 8, "max": 15 },
+    "4": { "min": 2, "max": 5 },
+    "5": { "min": 1, "max": 2 }
+  },
+  "drawQuality": [
+    { "quality": 5, "weight": 10 },
+    { "quality": 4, "weight": 60 },
+    { "quality": 3, "weight": 30 }
+  ],
+  "drawCount": {
+    "3": { "min": 5, "max": 15 },
+    "4": { "min": 1, "max": 5 },
+    "5": { "min": 1, "max": 2 }
+  },
+  "heroes": [
+    { "heroIndex": 52 },
+    { "heroIndex": 47 },
+    { "heroIndex": 40 },
+    { "heroIndex": 43 },
+    { "heroIndex": 39 }
+  ]
+}

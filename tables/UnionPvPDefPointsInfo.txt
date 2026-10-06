@@ -1,0 +1,11 @@
+	据点ID	据点名字	下一个据点	到下一个据点对应路点特效	据点的节点资源名	
+#	0	迷茫沼泽	1	NULL	judian01_01	|...|	2300001
+#	1	极寒沙漠	2	eff_scene_lijing_ghz_01	judian02_01	|...|	2300002
+#	2	永夜迷宫	3;4	eff_scene_lijing_ghz_02	judian03_01	|...|	2300003
+#	3	格朗萨姆	5;6	eff_scene_lijing_ghz_05	judian04_01	|...|	2300004
+#	4	科力尼亚	7;8	eff_scene_lijing_ghz_03	judian04_02	|...|	2300005
+#	5	黑铁迷宫	;	eff_scene_lijing_ghz_04	judian05_01	|...|	2300006
+#	6	翡翠林地	9	eff_scene_lijing_ghz_06	judian05_02	|...|	2300007
+#	7	玉龙湖	;	eff_scene_lijing_ghz_08	judian05_03	|...|	2300008
+#	8	炙阳沙漠	;	eff_scene_lijing_ghz_09	judian06_01	|...|	2300009
+#	9	不灭堡垒	;	eff_scene_lijing_ghz_07	zuizhongjudian01	|...|	2300010

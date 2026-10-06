@@ -1,0 +1,27 @@
+{
+  "ranks" : [ {
+    "kind" : "player",
+    "targetGuid" : 2000001,
+    "robotTableIndex" : 0,
+    "account" : "admin",
+    "rank" : 5001,
+    "wins" : 5,
+    "heroIndex" : 18,
+    "level" : 7,
+    "name" : "1",
+    "fightPower" : 2454
+  }, {
+    "kind" : "player",
+    "targetGuid" : 2000000,
+    "robotTableIndex" : 0,
+    "account" : "ltsjtest",
+    "rank" : 5002,
+    "wins" : 0,
+    "heroIndex" : 18,
+    "level" : 10,
+    "name" : "dcd",
+    "fightPower" : 3081
+  } ],
+  "lastWeeklyReset" : "2026-10-05",
+  "_说明" : "手改说明: 这里只存玩家，以及被打过/换过名次的机器人。5000 个默认机器人在 tables/JJC_Robot.txt，不要往 JSON 抄。 新号从最后一名开始（机器人数量+1），挑战列表只出比你名次高的机器人。 kind=robot|player. robot 的 targetGuid=表第 N 行（从 1 计，客户端 GetRobotData(guid-1)），外观和战斗全看客户端那一行，不能按 fightPower 现算。 每周重置后玩家排到机器人后面。lastWeeklyReset 是上次周重置的日期。"
+}

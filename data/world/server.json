@@ -1,0 +1,4 @@
+{
+  "openServerTime" : "2026-09-28 22:07:22",
+  "_说明" : "手改说明: openServerTime 是全服开服时间（yyyy-MM-dd HH:mm:ss），开服当天算第 1 天。 7 日狂欢/半月庆典等「开服第 N 天」玩法都以它为准，与单个账号的 createdAt 无关。 留空 = 下次启动自动写入当前时间；也可以在 application.yml 用 sao.open-server-time 覆盖（配置优先）。 本机这份取的是第一个真人档 data/players/admin.json 的创建时间（2026-09-28 22:07:22）。"
+}

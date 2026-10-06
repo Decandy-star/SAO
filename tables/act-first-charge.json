@@ -1,0 +1,32 @@
+{
+  "_说明": "首冲大回馈(type2)。C2S 2316→S2C 2618 下发最多 3 档；C2S 2317→S2C 2615 领奖。档位按客户端 GetCur1stChongZhiRMB()>mJE 递推选中（服务端 ActivityService.onFirstChongZhiAward 同算法并夹到末档）。mJE=门槛元，mJinBi/mRmb=金币/钻石，goods 最多 4 槽。档位内容照抄活动规划1.xlsx 行 3-5（文本见 docs/_tmp_xlsx_activity.txt）：6/30/96 元，金币 50000/100000/200000，mRmb 均为 0（客户端 ActivityMainUI.cs:1878 有 mRmb>0 才显示钻石槽）。改后重启假服。",
+  "_首槽硬约束": "客户端 ActivityMainUI.cs:1773-1778 拿 m1stChongZhiAward[0].oriName[0] 直接 EquipmentData.GetEquipmentData(...).chiBangPrefabName，无判空；必须是 equipType=4 的翅膀装备。xlsx 行 3 首档首槽指定「天使之翼」= EquipmentList.txt:60 EQ0075（品质4/类型4/CB_02）；备选 :58 EQ0043 精灵之翅 CB_06、:62 EQ0077 黑白之翼 CB_02、:83 EQ0098 传说精灵之翅 CB_06。填道具会 NRE 且整个首充页打不开。",
+  "tiers": [
+    {
+      "mJE": 6,
+      "mJinBi": 50000,
+      "mRmb": 0,
+      "goods": [
+        { "ori": "EQ0075", "count": 1, "stars": 1, "shining": true }
+      ]
+    },
+    {
+      "mJE": 30,
+      "mJinBi": 100000,
+      "mRmb": 0,
+      "goods": [
+        { "ori": "EQ0075", "count": 1, "stars": 1, "shining": true },
+        { "ori": "EQ0023", "count": 1, "stars": 1, "shining": false }
+      ]
+    },
+    {
+      "mJE": 96,
+      "mJinBi": 200000,
+      "mRmb": 0,
+      "goods": [
+        { "ori": "EQ0077", "count": 1, "stars": 1, "shining": true },
+        { "ori": "EQ0034", "count": 1, "stars": 1, "shining": false }
+      ]
+    }
+  ]
+}

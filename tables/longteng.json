@@ -1,0 +1,40 @@
+{
+  "_comment": "大厅「龙腾 / 限时兑换」配置。对应 C2S 3601 抽奖 / 3602 兑换商品 / 3603 榜单，S2C 4101 主数据 / 4102 抽奖结果 / 4103 榜单 / 4104 兑换结果。",
+  "_comment2": "原厂配置在服务端，APK 与假服都没有这张表，所以数值全部是产品估的兜底值，只保证客户端显示与假服自洽。",
+  "_comment3": "ori 全部取自 tables/GoodsList.txt：ZSDH01..ZSDH05 = 兑换勋章 1..5 星（:512-516）、ZSDH06 = 荣誉（:517）、ZSDH07 = 兑换币（:518）。",
+  "_comment4": "硬约束：medalNames 不能为空（ExchangeGoods.cs:176 直接取 .Count 不判空）；prizes[].medalLevel 只能 1..5（PublicIconPropertyCfg.cs:588 mXunZhangIconName = new string[5,2]）。",
+  "_comment5": "endTime 必须能按 yyyy-MM-dd HH:mm:ss 严格解析（ExchangeInATime.cs:278 DateTime.ParseExact）。留空 = 今天 + keepDays 天 23:59:59。",
+  "_comment6": "需抓真服包才能定论：两种 cost 的真实值、Prize 概率与星级、RankPrize 的 8 档、3601 究竟扣兑换币还是钻石（见 docs/PROTOCOL_GAP_REPORT.md §7）。",
+  "enabled": true,
+  "activeOnOff": 1,
+  "endTime": "",
+  "keepDays": 30,
+  "onceRmbCost": 60,
+  "tenRmbCost": 540,
+  "tokenName": "ZSDH07",
+  "onceTokenCost": 2,
+  "tenTokenCost": 18,
+  "honourName": "ZSDH06",
+  "rankId": 1,
+  "medalNames": ["ZSDH01", "ZSDH02", "ZSDH03", "ZSDH04", "ZSDH05"],
+  "prizes": [
+    { "moriName": "PY001", "goodsStar": 3, "goodsNum": 10, "medalLevel": 1, "medalNum": 5, "honourNum": 1, "weight": 40 },
+    { "moriName": "BX107", "goodsStar": 4, "goodsNum": 5, "medalLevel": 2, "medalNum": 3, "honourNum": 2, "weight": 25 },
+    { "moriName": "ZBSX01", "goodsStar": 4, "goodsNum": 3, "medalLevel": 3, "medalNum": 2, "honourNum": 5, "weight": 15 },
+    { "moriName": "JLBS01", "goodsStar": 5, "goodsNum": 1, "medalLevel": 4, "medalNum": 2, "honourNum": 10, "weight": 10 },
+    { "moriName": "TS101", "goodsStar": 5, "goodsNum": 1, "medalLevel": 5, "medalNum": 1, "honourNum": 20, "weight": 5 }
+  ],
+  "goods": [
+    { "oriName": "BX238", "goodsType": 1, "goodsStar": 4, "goodsNum": 1, "tokenCost": 10, "rmbCost": 0, "suipianName": "", "suipianNum": 0 },
+    { "oriName": "BX230", "goodsType": 1, "goodsStar": 5, "goodsNum": 1, "tokenCost": 30, "rmbCost": 0, "suipianName": "", "suipianNum": 0 },
+    { "oriName": "ZBSX01", "goodsType": 2, "goodsStar": 4, "goodsNum": 10, "tokenCost": 20, "rmbCost": 0, "suipianName": "ZBSX01", "suipianNum": 0 },
+    { "oriName": "GOODS117", "goodsType": 3, "goodsStar": 5, "goodsNum": 1, "tokenCost": 50, "rmbCost": 0, "suipianName": "", "suipianNum": 0 }
+  ],
+  "rankPrizes": [
+    { "jinBi": 500000, "rmb": 1000, "yingPo": 500, "goods1Name": "PY001", "goods1Num": 20, "goods2Name": "BX107", "goods2Num": 10, "rankLimit": 1 },
+    { "jinBi": 300000, "rmb": 600, "yingPo": 300, "goods1Name": "PY001", "goods1Num": 10, "goods2Name": "BX107", "goods2Num": 5, "rankLimit": 3 },
+    { "jinBi": 200000, "rmb": 400, "yingPo": 200, "goods1Name": "PY001", "goods1Num": 5, "goods2Name": "BX107", "goods2Num": 3, "rankLimit": 10 },
+    { "jinBi": 100000, "rmb": 200, "yingPo": 100, "goods1Name": "PY001", "goods1Num": 3, "goods2Name": "BX107", "goods2Num": 2, "rankLimit": 50 },
+    { "jinBi": 50000, "rmb": 100, "yingPo": 50, "goods1Name": "PY001", "goods1Num": 1, "goods2Name": "BX107", "goods2Num": 1, "rankLimit": 100 }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "_说明": "活动看板 titleList 目录（S2C 2601）。enabled=false 的活动看板不出现。本期可玩：type0 7日/type1 体力/type2 首冲/type4 壕送大礼每日轮换/type6 消耗返利/type10 至尊福利/type22 神域魔盒/type23 圣诞·新年兑换。其余活动服务端 handler 实装后再逐个 enabled=true。type23 subID 1=圣诞兑换 2=新年兑换（表 act-exchange.json）。顺序即看板 tab 顺序。修改后重启假服生效。",
+  "titles": [
+    { "type": 1, "subID": 0, "name": "免费吃大餐", "enabled": true },
+    { "type": 0, "subID": 0, "name": "登录送壕礼", "enabled": true },
+    { "type": 2, "subID": 0, "name": "首冲大回馈", "enabled": true },
+    { "type": 10, "subID": 0, "name": "至尊福利", "enabled": true },
+    { "type": 4, "subID": 0, "name": "壕送大礼", "enabled": true },
+    { "type": 5, "subID": 0, "name": "VIP特权礼包", "enabled": false },
+    { "type": 3, "subID": 0, "name": "限时送好礼", "enabled": false },
+    { "type": 9, "subID": 0, "name": "单冲返利", "enabled": false },
+    { "type": 6, "subID": 0, "name": "消耗返利", "enabled": true },
+    { "type": 11, "subID": 1, "name": "累计充值", "enabled": false },
+    { "type": 12, "subID": 1, "name": "积天返利", "enabled": false },
+    { "type": 7, "subID": 1, "name": "全服礼包", "enabled": false },
+    { "type": 8, "subID": 1, "name": "限时兑换", "enabled": false },
+    { "type": 15, "subID": 1, "name": "英雄兑换", "enabled": false },
+    { "type": 17, "subID": 1, "name": "可选奖励", "enabled": false },
+    { "type": 16, "subID": 1, "name": "可选消费", "enabled": false },
+    { "type": 18, "subID": 1, "name": "限购送礼", "enabled": false },
+    { "type": 19, "subID": 1, "name": "好礼总动员", "enabled": false },
+    { "type": 13, "subID": 1, "name": "消耗排行", "enabled": false },
+    { "type": 14, "subID": 1, "name": "充值排行", "enabled": false },
+    { "type": 21, "subID": 1, "name": "累计消耗", "enabled": false },
+    { "type": 22, "subID": 0, "name": "神域魔盒", "enabled": true },
+    { "type": 23, "subID": 1, "name": "圣诞兑换", "enabled": true },
+    { "type": 23, "subID": 2, "name": "新年兑换", "enabled": true },
+    { "type": 24, "subID": 0, "name": "开服基金", "enabled": false },
+    { "type": 25, "subID": 0, "name": "等级奖励", "enabled": false }
+  ]
+}

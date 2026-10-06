@@ -1,0 +1,16 @@
+{
+  "_说明": "神域魔盒(type22)参数。goodsOri=单抽消耗道具(魔瓶)；每抽一次消耗翻倍（base 起步 1），魔瓶不足时按 diamondCost 固定钻石兜底。奖池直接取自 GoodsList/EquipmentList 全部有品质物品+装备（排除双倍充值卡/喇叭），每格按 quality 档随机。9 格=金1+紫7+蓝1。refreshDaily=true 每天 0 点自动换一组新牌并清空当日翻倍计数。recordKeep 中奖记录条数。",
+  "_quality口径": "grids 的 quality 是**物品真实品质**（1 白…5 金），只用于从奖池选物品；回包 CCMsgMagicBoxPrize.quality 发的是**降序档位**（1=最高档），由 ActivityService.mbWireQuality 换算（6-真实品质）：金5→1、紫4→2、蓝3→3。依据见 docs\\PROTOCOL.md「神域魔盒」段。",
+  "goodsOri": "SYMH01",
+  "diamondCost": 200,
+  "costGoodsBase": 1,
+  "doublePerDraw": true,
+  "resetCostDiamond": 0,
+  "grids": {
+    "gold": { "count": 1, "quality": 5, "countMin": 1, "countMax": 3 },
+    "purple": { "count": 7, "quality": 4, "countMin": 1, "countMax": 2 },
+    "blue": { "count": 1, "quality": 3, "countMin": 1, "countMax": 3 }
+  },
+  "recordKeep": 20,
+  "refreshDaily": true
+}

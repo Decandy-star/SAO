@@ -1,0 +1,1152 @@
+{
+  "_说明": "由 gen_gacha_pool.py 按 docs/GACHA_PLAN.md 生成。weight=1 等概率。gold=紫及以下装备碎片+全部魂石碎片（count=1）；diamond=蓝及以上完整装备+可玩完整英雄+紫及以上装碎*5+3星及以上英雄碎*5。改表后重跑本脚本再重启假服。",
+  "gold": [
+    {
+      "type": "item",
+      "ori": "GOODS1",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS2",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS3",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS4",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS5",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS6",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS102",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS103",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS110",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS115",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS116",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS118",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS119",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS144",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS145",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS146",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP035",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS246",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS244",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS245",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP039",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP040",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP041",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP042",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP043",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP044",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP045",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP046",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP047",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP048",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP049",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP050",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP051",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP052",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP1",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP2",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP3",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP4",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP5",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP6",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP7",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP8",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP9",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP10",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP11",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP12",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP13",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP14",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP15",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP16",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP17",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP18",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP19",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP20",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP21",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP22",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP24",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP25",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP26",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP27",
+      "count": 1,
+      "weight": 1
+    }
+  ],
+  "diamond": [
+    {
+      "type": "equip",
+      "ori": "EQ0023",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0024",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0025",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0026",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0027",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0028",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0029",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0030",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0031",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0034",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0035",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0036",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0037",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0038",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0039",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0040",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0041",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0042",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0043",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0044",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0075",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0076",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0077",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0078",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0079",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0080",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0081",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0082",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0083",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0084",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0085",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0086",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0087",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0088",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0089",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0090",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0091",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0092",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0093",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0094",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0095",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0096",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0097",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0098",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0099",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0100",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0101",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0102",
+      "weight": 1
+    },
+    {
+      "type": "equip",
+      "ori": "EQ0103",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 17,
+      "fragmentOri": "GOODS115",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 18,
+      "fragmentOri": "GOODS3",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 19,
+      "fragmentOri": "GOODS6",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 20,
+      "fragmentOri": "GOODS1",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 21,
+      "fragmentOri": "GOODS2",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 23,
+      "fragmentOri": "GOODS4",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 24,
+      "fragmentOri": "GOODS5",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 26,
+      "fragmentOri": "GOODS102",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 27,
+      "fragmentOri": "GOODS103",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 28,
+      "fragmentOri": "GOODS110",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 29,
+      "fragmentOri": "GOODS116",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 30,
+      "fragmentOri": "GOODS118",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 31,
+      "fragmentOri": "GOODS119",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 32,
+      "fragmentOri": "GOODS144",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 33,
+      "fragmentOri": "GOODS145",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 34,
+      "fragmentOri": "GOODS146",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 35,
+      "fragmentOri": "SP035",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 36,
+      "fragmentOri": "GOODS246",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 37,
+      "fragmentOri": "GOODS244",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 38,
+      "fragmentOri": "GOODS245",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 39,
+      "fragmentOri": "SP039",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 40,
+      "fragmentOri": "SP040",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 41,
+      "fragmentOri": "SP041",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 42,
+      "fragmentOri": "SP042",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 43,
+      "fragmentOri": "SP043",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 44,
+      "fragmentOri": "SP044",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 45,
+      "fragmentOri": "SP045",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 46,
+      "fragmentOri": "SP046",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 47,
+      "fragmentOri": "SP047",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 48,
+      "fragmentOri": "SP048",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 49,
+      "fragmentOri": "SP049",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 50,
+      "fragmentOri": "SP050",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 51,
+      "fragmentOri": "SP051",
+      "weight": 1
+    },
+    {
+      "type": "hero",
+      "heroIndex": 52,
+      "fragmentOri": "SP052",
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP12",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP13",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP14",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP15",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP16",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP17",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP18",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP19",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP20",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP21",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP22",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP23",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP24",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP25",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP26",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP27",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP28",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP29",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP30",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP31",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP32",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP33",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP34",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP35",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP36",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP37",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP38",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP39",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP40",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP41",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP42",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP43",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP44",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP45",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP46",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP47",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP48",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP49",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP50",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "ZBSP51",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS115",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS2",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS102",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS144",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "GOODS146",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP040",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP042",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP043",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP045",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP046",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP047",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP048",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP049",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP050",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP051",
+      "count": 5,
+      "weight": 1
+    },
+    {
+      "type": "item",
+      "ori": "SP052",
+      "count": 5,
+      "weight": 1
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+
+  "_说明": "竞技场/争霸/跨服日程。改完不必重启：公共调度启动补跑/每日0点/发邮钟点闸门会按 mtime 重读。jjcRankMail=每天几点发 JJC 排名邮(mailType=1)。zbzRankMail=排位赛结束后发争霸排名邮(mailType=19)。kfzPaiWeiRankMail=跨服排位日排名邮(mailType=20)。kfzDfzRankMail=巅峰结束后发跨服巅峰排名邮(mailType=20，默认21:35)。jjcWeeklyReset=每周几几点重置名次。jjcChallengeMaxAbove=挑战列表最多比自己高多少名。月卡返钻不在此文件。weekday 1=周一…7=周日。",
+
+  "jjcRankMail": {
+
+    "enabled": true,
+
+    "hour": 21,
+
+    "minute": 0
+
+  },
+
+  "jjcWeeklyReset": {
+
+    "enabled": true,
+
+    "weekday": 1,
+
+    "hour": 0,
+
+    "minute": 0
+
+  },
+
+  "jjcChallengeMaxAbove": 50,
+
+  "zbzRankMail": {
+
+    "enabled": true,
+
+    "hour": 23,
+
+    "minute": 30
+
+  },
+
+  "kfzPaiWeiRankMail": {
+
+    "enabled": true,
+
+    "hour": 21,
+
+    "minute": 0
+
+  },
+
+  "kfzDfzRankMail": {
+
+    "enabled": true,
+
+    "hour": 21,
+
+    "minute": 35
+
+  }
+
+}
+

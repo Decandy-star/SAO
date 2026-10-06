@@ -1,0 +1,5 @@
+[00ff00]活动公告[-]
+
+单机假服测试公告。改 sao-fake-server/tables/notices/EventNotice.txt 后刷新即可，不用重启假服（当前实现是每次 GET 读盘）。
+
+进大厅弹窗走这条。客户端 UI 暂时关着，确认文案后再打开 PlayGameState 里 EN_OPEN_INGAME_NOTICE_UI。
