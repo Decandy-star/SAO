@@ -70,6 +70,123 @@ public class DungeonService {
         this.ltsj = ltsj;
     }
 
+    /**
+     * 主线（普通/精英）进本与扫荡的共用前置校验，逐条对齐客户端：
+     * <ul>
+     *   <li>region 必须是 {@code RegionList} 里的主线场景</li>
+     *   <li>普通解锁 {@code ChapterGuanKaCommonInfo.GetPuTongLastOpenChapterGuanKaID()}（:67-93）</li>
+     *   <li>精英解锁 {@code GetJinYingLastOpenChapterGuanKaID()}（:97-142）：总开关 = 普通进度 ≥
+     *       {@code GlobalSetup_CH} token66（实表 3010），之后 3→6→9→10 递进</li>
+     *   <li>受限关（章内 3/6/9/10）每日剩余次数 ≥ 1：客户端 {@code FBStarInfo.NeedCheckPlayTime}（:19）</li>
+     *   <li>体力 ≥ {@code RegionList} col6/col7（普通 8 / 精英 16）：
+     *       客户端 {@code NormalFBDescribeSystem.cs:785-797 CanPlayFB}</li>
+     * </ul>
+     * 客户端在发 C2S 301/310 之前已经把这些门都过了一遍，所以正常客户端不会撞到这里，
+     * 这里拦的是改包/绕客户端。**不通过就静默不发包**（与 {@link #onBuyMainFbPlayTime} 的
+     * {@code playLeft > 0} 分支同风格）；表没读到（{@link GameTables#mainFbGatesAvailable()} 为 false）
+     * 时一律放行，避免一次读表失败把进本全砖掉。
+     *
+     * @return null = 允许；否则是不允许的原因（只用于日志）
+     */
+    private String mainFbRefuseReason(PlayerRecord rec, int region, int diff) {
+        if (region <= 0) {
+            return "region<=0";
+        }
+        if (!tables.mainFbGatesAvailable()) {
+            return null;
+        }
+        if (tables.regionNormalEnergy(region) <= 0) {
+            return "region " + region + " not in RegionList";
+        }
+        // 章节表（ChapterList.txt）没读到 ⇒ chapterCount()==0：跳过「可打到第几关」的推进校验
+        // （否则停在章内第 10 关的账号会被卡在 1010，永远推不进下一章）。精英总开关来自
+        // GlobalSetup_CH，与章节表无关，仍要判。
+        boolean chapterTableReady = tables.chapterCount() > 0;
+        if (diff == 2) {
+            int unlock = tables.eliteUnlockRegion();
+            if (rec.progress.lastNormalStage < unlock) {
+                return "elite locked: normal " + rec.progress.lastNormalStage + " < " + unlock;
+            }
+            if (chapterTableReady) {
+                int max = eliteMaxOpenRegion(rec);
+                if (region > max) {
+                    return "elite " + region + " > maxOpen " + max;
+                }
+            }
+        } else if (chapterTableReady) {
+            int max = normalMaxOpenRegion(rec);
+            if (region > max) {
+                return "normal " + region + " > maxOpen " + max;
+            }
+        }
+        if (PlayerDumpService.needMainFbPlayLimit(region)) {
+            progress.ensureDaily(rec);
+            PlayerRecord.StagePlayLimit lim = dump.ensureMainFbPlayLimit(
+                    rec, PlayerRecord.stageKey(region, diff), region, diff);
+            if (lim.playLeft <= 0) {
+                return "no play left for " + region + "/" + diff;
+            }
+        }
+        int energy = mainFbEnergy(region, diff);
+        if (rec.stamina < energy) {
+            return "stamina " + rec.stamina + " < " + energy;
+        }
+        return null;
+    }
+
+    /** 主线单次体力：RegionList col6/col7（普通 8 / 精英 16）；表里没有才退回 dungeon-vp-cost。 */
+    private int mainFbEnergy(int region, int diff) {
+        int energy = tables.regionEnergy(region, diff);
+        if (energy <= 0) {
+            energy = tables.regionNormalEnergy(region);
+        }
+        return energy > 0 ? energy : props.getDungeonVpCost();
+    }
+
+    /**
+     * 普通关当前可打到的最远关卡 ID：客户端 {@code ChapterGuanKaCommonInfo.GetPuTongLastOpenChapterGuanKaID()}
+     * （:67-93）——上次通关关 +1；若停在章内第 10 关且角色等级 ≥ 下一章 {@code mOpenLevel} 则推进到下一章第 1 关；
+     * 下限 1001、上限 {@code 章节数*1000+10}。
+     */
+    private int normalMaxOpenRegion(PlayerRecord rec) {
+        int last = Math.max(0, rec.progress.lastNormalStage);
+        int chapter = last / 1000;
+        int stage = last % 1000;
+        int count = tables.chapterCount();
+        if (stage == 10 && chapter < count && rec.level >= tables.chapterOpenLevel(chapter + 1)) {
+            chapter++;
+            stage = 1;
+        } else if (stage > 0 && stage < 10) {
+            stage++;
+        }
+        int max = chapter * 1000 + stage;
+        int upper = count > 0 ? count * 1000 + 10 : 28010;
+        return Math.max(1001, Math.min(max, upper));
+    }
+
+    /**
+     * 精英关当前可打到的最远关卡 ID：客户端 {@code GetJinYingLastOpenChapterGuanKaID()}（:97-142）——
+     * 精英进度只在章内 3→6→9→10 递进，本关打完 10 且普通进度已进下一章时才跳到下一章第 3 关；
+     * 下限 1003。总开关（普通进度 ≥ token66）由 {@link #mainFbRefuseReason} 单独判。
+     */
+    private int eliteMaxOpenRegion(PlayerRecord rec) {
+        int lastHard = Math.max(0, rec.progress.lastHardStage);
+        int lastNormal = Math.max(0, rec.progress.lastNormalStage);
+        int hc = lastHard / 1000;
+        int hs = lastHard % 1000;
+        int nc = lastNormal / 1000;
+        int ns = lastNormal % 1000;
+        if (hs == 10 && (hc < nc - 1 || (hc == nc - 1 && ns == 10))) {
+            hc++;
+            hs = 3;
+        } else if (hs < 10) {
+            hs += 3;
+        } else {
+            hs++;
+        }
+        return Math.max(1003, hc * 1000 + hs);
+    }
+
     public void onEnterFb(GameSession session, GamePacket pkt) {
         PlayerRecord rec = session.player();
         if (rec == null) {
@@ -81,10 +198,15 @@ public class DungeonService {
         if (difficult <= 0) {
             difficult = 1;
         }
+        String refuse = mainFbRefuseReason(rec, region, difficult);
+        if (refuse != null) {
+            log.info("{} enter fb refused region={} diff={}: {}", rec.account, region, difficult, refuse);
+            return;
+        }
         rec.currentRegionId = region;
         rec.setLastBattleDifficultyCode(difficult);
         rec.lastResourceRegionType = 0;
-        progress.spendStamina(rec, props.getDungeonVpCost());
+        progress.spendStamina(rec, mainFbEnergy(region, difficult));
         // 进本预 roll：401 结算展示与通关实发同一份
         String starKey = region + "/" + (difficult == 2 ? "hard" : "normal");
         boolean firstClear = rec.progress.stageStars.getOrDefault(starKey, 0) <= 0;
@@ -95,7 +217,7 @@ public class DungeonService {
         session.send(MsgIds.S2C_ATTRI_UPDATE, pkt, dump.attri(2, rec.stamina));
         session.send(MsgIds.S2C_FB_INFO, pkt, dump.fbInfo(
                 pending.region, pending.gold, pending.playerExp, pending.wjExp,
-                pending.wnsp, pending.yingPo, toGoodsDrops(pending), false));
+                displayWnsp(pending), displayYingPo(pending), toDisplayGoodsDrops(pending), false));
         session.send(MsgIds.S2C_CHANGE_REGION_RET, pkt, dump.changeRegion(region));
         log.info("{} enter fb region={} diff={} drops={} wnsp={} ying={}",
                 rec.account, region, difficult, pending.drops.size(), pending.wnsp, pending.yingPo);
@@ -133,17 +255,26 @@ public class DungeonService {
         int result = f.getInt(1, 0);
         int star = f.getInt(2, 0);
         int resourceType = rec.lastResourceRegionType;
+        byte[] playTimeUpdate = null;
         if (result == 1) {
             if (resourceType > 0) {
                 applyResourceWin(session, pkt, rec, star);
             } else {
-                applyWin(session, pkt, rec, star);
+                playTimeUpdate = applyWin(session, pkt, rec, star);
                 task.onChapterWin(session, pkt, rec, rec.currentRegionId, rec.lastBattleDifficultyCode(), 1);
             }
         }
         clearLastResource(rec);
         store.save(rec);
         session.send(MsgIds.S2C_RESULT_FB_RET, pkt, dump.resultFb(result, star));
+        // 1002 必须**晚于** 1001：客户端收到 1001 才会一路走到 ShowVictoryUI
+        // （BattleController.cs:682-684 用 DelegateSendNetMsgManager 挂在 EN_RESULTFB_RET_SUCCESS 上），
+        // 由它 new FBStarInfo(...) 建出该关条目（BattleController.cs:1390-1398，mFBPlayTimeLeft 默认 0）；
+        // 而 OnFBPlayTimeUpdate（PlayGameState.cs:5773-5782）对 mFBStarList 里没有的 fbID 直接 continue。
+        // 先发 1002 ⇒ 首次通关那一次更新被丢掉、随后条目被建成 0 ⇒ 界面上「挑战次数被置 0」。
+        if (playTimeUpdate != null) {
+            session.send(MsgIds.S2C_UPDATE_FB_PLAY_TIME, pkt, playTimeUpdate);
+        }
         log.info("{} result fb result={} star={} resourceType={}",
                 rec.account, result, star, resourceType);
     }
@@ -160,7 +291,33 @@ public class DungeonService {
             diff = 1;
         }
         boolean once = f.getBool(3);
-        int times = once ? 1 : 10;
+        String refuse = mainFbRefuseReason(rec, region, diff);
+        if (refuse != null) {
+            log.info("{} saodang refused region={} diff={}: {}", rec.account, region, diff, refuse);
+            return;
+        }
+        // 只有受限关（章内 3/6/9/10）能扫荡：客户端 CheckSaoDang 对 !NeedCheckPlayTime 直接 return false
+        // （NormalFBDescribeSystem.cs:774-778），非受限关扫荡按钮根本不亮。
+        if (!PlayerDumpService.needMainFbPlayLimit(region)) {
+            log.info("{} saodang refused region={} diff={}: not a limited stage", rec.account, region, diff);
+            return;
+        }
+        // 三星才能扫荡（单次/十连同门）：NormalFBDescribeSystem.cs:754-755 mFBStarList[levelID].Stars < 3。
+        if (rec.progress.stageStars.getOrDefault(PlayerRecord.stageKey(region, diff), 0) < 3) {
+            log.info("{} saodang refused region={} diff={}: stars < 3", rec.account, region, diff);
+            return;
+        }
+        // 十连扫荡的 VIP 门：VipCfg「开启十连扫荡」（客户端 CheckSaoDang :735 VipManager.IsOpenShaoDang10Ci，
+        // 实表 VIP2 起为 1）；单次扫荡无 VIP 门。
+        if (!once && !economy.openShaoDang10Ci(rec.economy.chargedDiamond)) {
+            log.info("{} saodang refused region={} diff={}: 10x needs VIP", rec.account, region, diff);
+            return;
+        }
+        int times = once ? 1 : sweepTimes(rec, region, diff);
+        if (times <= 0) {
+            log.info("{} saodang refused region={} diff={}: no times", rec.account, region, diff);
+            return;
+        }
         rec.currentRegionId = region;
         rec.setLastBattleDifficultyCode(diff);
         session.send(MsgIds.S2C_SAO_DANG_RET, pkt, sweep(session, pkt, rec, region, diff, times));
@@ -327,7 +484,21 @@ public class DungeonService {
     }
 
     private byte[] sweep(GameSession session, GamePacket pkt, PlayerRecord rec, int region, int diff, int times) {
-        return sweep(session, pkt, rec, region, diff, times, props.getDungeonVpCost(), true, null);
+        return sweep(session, pkt, rec, region, diff, times, mainFbEnergy(region, diff), true, null);
+    }
+
+    /**
+     * 十连扫荡实际次数：客户端 {@code FBStarInfo.GetRealPlayMaxTime()}（:45-58）——
+     * {@code min(剩余次数, 当前体力/单次体力)}（体力整除为 0 时取剩余次数）。
+     * 服务端按同一算式自己算（C2S 310 包里没有次数字段）。
+     */
+    private int sweepTimes(PlayerRecord rec, int region, int diff) {
+        int energy = mainFbEnergy(region, diff);
+        progress.ensureDaily(rec);
+        PlayerRecord.StagePlayLimit lim = dump.ensureMainFbPlayLimit(
+                rec, PlayerRecord.stageKey(region, diff), region, diff);
+        int byStamina = energy > 0 ? rec.stamina / energy : lim.playLeft;
+        return Math.min(lim.playLeft, byStamina);
     }
 
     private byte[] sweep(GameSession session, GamePacket pkt, PlayerRecord rec, int region, int diff, int times,
@@ -376,7 +547,10 @@ public class DungeonService {
             bases.add(dump.saoDangBase(pExp, gold, wnsp, ying, drops));
         }
         if (consumeMainLimit) {
-            consumeMainFbPlayTime(session, pkt, rec, region, diff, times);
+            byte[] limUpdate = consumeMainFbPlayTime(rec, region, diff, times);
+            if (limUpdate != null) {
+                session.send(MsgIds.S2C_UPDATE_FB_PLAY_TIME, pkt, limUpdate);
+            }
         }
         store.save(rec);
         progress.pushGoods(session, pkt, rec, changed);
@@ -395,7 +569,8 @@ public class DungeonService {
         return dump.saoDangResult(bases);
     }
 
-    private void applyWin(GameSession session, GamePacket pkt, PlayerRecord rec, int star) {
+    /** @return 受限关次数的 S2C 1002 包（没有则 null）；由 {@link #onResultFb} 在 1001 **之后**发。 */
+    private byte[] applyWin(GameSession session, GamePacket pkt, PlayerRecord rec, int star) {
         int region = rec.currentRegionId;
         int diff = rec.lastBattleDifficultyCode();
         String starKey = PlayerRecord.stageKey(region, diff);
@@ -434,7 +609,7 @@ public class DungeonService {
         for (PlayerRecord.Hero wj : rec.heroes) {
             wjLeveled.add(progress.addWjExp(rec, wj, wExp));
         }
-        consumeMainFbPlayTime(session, pkt, rec, region, diff, 1);
+        byte[] playTimeUpdate = consumeMainFbPlayTime(rec, region, diff, 1);
         store.save(rec);
 
         progress.pushGoods(session, pkt, rec, changed);
@@ -450,6 +625,7 @@ public class DungeonService {
             progress.pushWjProgress(session, pkt, rec, rec.heroes.get(i), wjLeveled.get(i));
         }
         task.onPlayerLeveled(session, pkt, rec, pLv);
+        return playTimeUpdate;
     }
 
     /** 资源挑战通关：按玩法×难度落最高星，推 450；不写主线 stageStars、不扣主线限次。 */
@@ -550,6 +726,43 @@ public class DungeonService {
         }
     }
 
+    /**
+     * 章节宝箱的「宝箱位 → 难度/门槛星数」。
+     * 客户端 {@code MainPlayer.GetChapterBaoXiangState}（:2235-2258）：位 = {@code 1 << (level-1 + (nanDu==1?0:3))}
+     * ⇒ 普通 1/2/4、精英 8/16/32；门槛 {@code num = nanDu==2?4:10}、要求 {@code 章节星数 >= num*level}
+     * ⇒ 普通 10/20/30 星、精英 4/8/12 星。与 {@code ChapterBaoXiang.txt}「宝箱等级」列的表头注释同口径。
+     *
+     * @return {@code {难度, 门槛星数}}；认不出该位返回 null（不拦，交给原有逻辑）
+     */
+    private static int[] chestRequirement(int box) {
+        switch (box) {
+            case 1:
+                return new int[]{1, 10};
+            case 2:
+                return new int[]{1, 20};
+            case 4:
+                return new int[]{1, 30};
+            case 8:
+                return new int[]{2, 4};
+            case 16:
+                return new int[]{2, 8};
+            case 32:
+                return new int[]{2, 12};
+            default:
+                return null;
+        }
+    }
+
+    /** 章节星数合计：客户端 {@code ChapterGuanKaCommonInfo.GetChapterXinJi}（:39-51）逐关 1..10 累加同难度星数。 */
+    private int chapterStars(PlayerRecord rec, int chapter, int nanDu) {
+        int sum = 0;
+        for (int stage = 1; stage <= 10; stage++) {
+            int region = chapter * 1000 + stage;
+            sum += rec.progress.stageStars.getOrDefault(PlayerRecord.stageKey(region, nanDu), 0);
+        }
+        return sum;
+    }
+
     public void onChapterChest(GameSession session, GamePacket pkt) {
         PlayerRecord rec = session.player();
         if (rec == null) {
@@ -561,6 +774,17 @@ public class DungeonService {
         int have = rec.economy.chapterChests.getOrDefault(Integer.valueOf(chapter), 0);
         if ((have & box) != 0) {
             return;
+        }
+        // 星数门槛硬编码在客户端（MainPlayer.GetChapterBaoXiangState :2253 chapterXinJi < num*level），
+        // 表里只有「宝箱等级」位掩码、没有门槛列，所以服务端按同一算式自己算。
+        int[] need = chestRequirement(box);
+        if (need != null) {
+            int stars = chapterStars(rec, chapter, need[0]);
+            if (stars < need[1]) {
+                log.info("{} chapter chest refused chapter={} box={}: stars {} < {}",
+                        rec.account, chapter, box, stars, need[1]);
+                return;
+            }
         }
         EconomyTables.ChestRow row = economy.chest(chapter, box);
         rec.economy.chapterChests.put(Integer.valueOf(chapter), have | box);
@@ -632,7 +856,7 @@ public class DungeonService {
         }
         session.send(MsgIds.S2C_FB_INFO, pkt, dump.fbInfo(
                 pending.region, pending.gold, pending.playerExp, pending.wjExp,
-                pending.wnsp, pending.yingPo, toGoodsDrops(pending), false));
+                displayWnsp(pending), displayYingPo(pending), toDisplayGoodsDrops(pending), false));
         session.send(MsgIds.S2C_CHANGE_REGION_RET, pkt, dump.changeRegion(sceneId));
         log.info("{} resource enter type={} lv={} scene={} dropRegion={}",
                 rec.account, regionType, level, sceneId, dropRegion);
@@ -703,13 +927,23 @@ public class DungeonService {
             return;
         }
         boolean elite = diff == 2;
+        // 每日购买次数上限：VipCfg「普通/精英副本重置」（客户端 NormalFBDescribeSystem.cs:867
+        // mResetMaxCount = IsJY ? VipManager.JYFBResetMaxCount : VipManager.FBResetMaxCount，
+        // 实表 VIP0=0、VIP1=1、VIP2=2 ⇒ VIP0 当天买不了）。
+        int maxReset = elite ? economy.jyFbResetMaxCount(rec.economy.chargedDiamond)
+                : economy.fbResetMaxCount(rec.economy.chargedDiamond);
+        if (lim.buyTimes >= maxReset) {
+            log.info("{} buy main-fb reset refused fbId={}: buyTimes {} >= max {}",
+                    rec.account, fbId, lim.buyTimes, maxReset);
+            return;
+        }
         int cost = economy.buyFbDiamond(elite, lim.buyTimes + 1);
         if (cost <= 0 || rec.diamond < cost) {
             return;
         }
         rec.diamond -= cost;
         lim.buyTimes++;
-        lim.playLeft = PlayerDumpService.mainFbPlayMax(diff);
+        lim.playLeft = dump.mainFbPlayMax(diff, region);
         store.save(rec);
         progress.pushDiamond(session, pkt, rec);
         session.send(MsgIds.S2C_UPDATE_FB_PLAY_TIME, pkt,
@@ -738,19 +972,22 @@ public class DungeonService {
         session.send(MsgIds.S2C_RESOURCE_FB_UPDATE, pkt, dump.resourceFbUpdate(rec));
     }
 
-    /** 受限关消耗剩余次数；不足则仍扣到 0（扫荡前客户端应已拦）。 */
-    private void consumeMainFbPlayTime(GameSession session, GamePacket pkt, PlayerRecord rec,
-                                      int region, int diff, int times) {
+    /**
+     * 受限关消耗剩余次数；不足则仍扣到 0（扫荡前客户端应已拦）。
+     * **只造包不发送**：主线通关那次必须等 1001 发完再发 1002（见 {@link #onResultFb}）。
+     *
+     * @return S2C 1002 包；该关不限次/次数为 0 时返回 null
+     */
+    private byte[] consumeMainFbPlayTime(PlayerRecord rec, int region, int diff, int times) {
         if (!PlayerDumpService.needMainFbPlayLimit(region) || times <= 0) {
-            return;
+            return null;
         }
         progress.ensureDaily(rec);
         String key = PlayerRecord.stageKey(region, diff);
         PlayerRecord.StagePlayLimit lim = dump.ensureMainFbPlayLimit(rec, key, region, diff);
         lim.playLeft = Math.max(0, lim.playLeft - times);
         int fbId = region * 10 + (diff == 2 ? 2 : 1);
-        session.send(MsgIds.S2C_UPDATE_FB_PLAY_TIME, pkt,
-                dump.fbPlayTimeUpdate(fbId, lim.playLeft, lim.buyTimes));
+        return dump.fbPlayTimeUpdate(fbId, lim.playLeft, lim.buyTimes);
     }
 
     public void onSellGoods(GameSession session, GamePacket pkt) {
@@ -1213,6 +1450,9 @@ public class DungeonService {
                 }
             }
         }
+        // 资源挑战没有「首通必掉」，展示列表与发放列表同份（仍置位，免走旧档回退分支）。
+        p.displaySplit = true;
+        p.displayDrops.addAll(p.drops);
         return p;
     }
 
@@ -1224,8 +1464,9 @@ public class DungeonService {
         p.gold = drop != null ? drop.gold : props.getDungeonGold();
         p.playerExp = drop != null ? drop.playerExp : props.getDungeonPlayerExp();
         p.wjExp = drop != null ? drop.wjExp : props.getDungeonWujiangExp();
+        List<GameTables.GoodsDrop> certain = new ArrayList<>();
         List<GameTables.GoodsDrop> rolled = drop != null
-                ? drop.roll(rng, firstClear)
+                ? drop.roll(rng, firstClear, certain)
                 : java.util.Collections.singletonList(
                         new GameTables.GoodsDrop(props.getDropOriName(), props.getDropCount()));
         if (rolled == null) {
@@ -1243,7 +1484,34 @@ public class DungeonService {
         maybeAppendWordCharPending(region, p.drops);
         p.wnsp = drop != null ? drop.rollWnsp(rng, firstClear) : 0;
         p.yingPo = drop != null ? drop.rollYingPo(rng, firstClear) : 0;
+        // 401 展示列表：扣掉「首通必掉」。客户端在未通关该关时会按 RegionDropList 表的
+        // CertainDropGoods1..3 / CertainDropYinPoCount / CertainDropWNSPCount 自己再加一遍
+        // （NormalFBGoodsGrant.cs:174-268 结算面板、DropGoodsManager.cs:215-236 局内掉落池），
+        // 服务端若也下发同一份，玩家看到的就是背包实收的两倍。
+        p.displaySplit = true;
+        p.displayDrops.addAll(p.drops);
+        for (GameTables.GoodsDrop c : certain) {
+            removeOnePendingDrop(p.displayDrops, c.ori, c.count);
+        }
+        int certainWnsp = firstClear && drop != null ? Math.max(0, drop.firstWnspCount) : 0;
+        int certainYingPo = firstClear && drop != null ? Math.max(0, drop.firstYingPoCount) : 0;
+        p.displayWnsp = Math.max(0, p.wnsp - certainWnsp);
+        p.displayYingPo = Math.max(0, p.yingPo - certainYingPo);
         return p;
+    }
+
+    /** 从展示列表里摘掉一条 (ori,count) —— 只摘一次，用于扣掉首通必掉里的那一件。 */
+    private static void removeOnePendingDrop(List<PlayerRecord.PendingDrop> list, String ori, int count) {
+        if (list == null || ori == null || ori.isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            PlayerRecord.PendingDrop d = list.get(i);
+            if (d != null && ori.equals(d.ori) && d.count == count) {
+                list.remove(i);
+                return;
+            }
+        }
     }
 
     private void clearLastResource(PlayerRecord rec) {
@@ -1278,7 +1546,7 @@ public class DungeonService {
         if (!canEnterResource(rec, regionType, level)) {
             return false;
         }
-        if (!economy.resourceFbSaoDangOpen(rec.economy.chargedDiamond)) {
+        if (!resourceFbSaoDangAllowed(rec)) {
             return false;
         }
         PlayerRecord.ResourceFb fb = rec.resourceFb.get(Integer.valueOf(regionType));
@@ -1287,6 +1555,27 @@ public class DungeonService {
         }
         Integer star = fb.stars.get(Integer.valueOf(level));
         return star != null && star.intValue() >= 3;
+    }
+
+    /**
+     * 资源挑战（镜像/不可触/致命/圣诞/镰刀）扫荡门 —— 与客户端
+     * {@code TiaoZhanNanDu.ConfirmDiffulty}（TiaoZhanNanDu.cs:582-616）同一套判据，口径由登录 detail 下发：
+     * 0 = 只按 VipCfg 第 46 列「日常活动扫荡」（现网整列 0 ⇒ 永远锁死，客户端会提示「需要VIP0」）；
+     * 1 = 只按账号等级 ≥ {@code ResourceFBSaoDangLevelRequire}；2 = 两者都要。
+     * 假服下发 requireType=1 / levelRequire=1（{@code PlayerDumpService#writeDetail}），这里必须同口径，
+     * 否则客户端放行、服务端静默只回 450。
+     */
+    private boolean resourceFbSaoDangAllowed(PlayerRecord rec) {
+        int type = PlayerDumpService.RESOURCE_FB_SAO_DANG_REQUIRE_TYPE;
+        boolean byVip = economy.resourceFbSaoDangOpen(rec.economy.chargedDiamond);
+        boolean byLevel = rec.level >= PlayerDumpService.RESOURCE_FB_SAO_DANG_LEVEL_REQUIRE;
+        if (type == 0) {
+            return byVip;
+        }
+        if (type == 1) {
+            return byLevel;
+        }
+        return byVip && byLevel;
     }
 
     private boolean resourceCdReady(PlayerRecord rec, int regionType) {
@@ -1393,11 +1682,46 @@ public class DungeonService {
     }
 
     private static List<GameTables.GoodsDrop> toGoodsDrops(PlayerRecord.PendingFbReward pending) {
+        if (pending == null) {
+            return new ArrayList<>();
+        }
+        return toGoodsDrops(pending.drops);
+    }
+
+    /**
+     * 下发 S2C 401 的展示用掉落：**不含首通必掉**（客户端会按本地表自己加，见
+     * {@link #buildPendingFb}）。旧档（{@code displaySplit=false}）退回 {@link #toGoodsDrops}
+     * 全量 = 老行为。
+     */
+    private static List<GameTables.GoodsDrop> toDisplayGoodsDrops(PlayerRecord.PendingFbReward pending) {
+        if (pending == null) {
+            return new ArrayList<>();
+        }
+        return toGoodsDrops(pending.displaySplit ? pending.displayDrops : pending.drops);
+    }
+
+    /** S2C 401 field5：首通那份不重复下发。 */
+    private static int displayWnsp(PlayerRecord.PendingFbReward pending) {
+        if (pending == null) {
+            return 0;
+        }
+        return pending.displaySplit ? Math.max(0, pending.displayWnsp) : pending.wnsp;
+    }
+
+    /** S2C 401 field6：首通那份不重复下发。 */
+    private static int displayYingPo(PlayerRecord.PendingFbReward pending) {
+        if (pending == null) {
+            return 0;
+        }
+        return pending.displaySplit ? Math.max(0, pending.displayYingPo) : pending.yingPo;
+    }
+
+    private static List<GameTables.GoodsDrop> toGoodsDrops(List<PlayerRecord.PendingDrop> drops) {
         List<GameTables.GoodsDrop> out = new ArrayList<>();
-        if (pending == null || pending.drops == null) {
+        if (drops == null) {
             return out;
         }
-        for (PlayerRecord.PendingDrop d : pending.drops) {
+        for (PlayerRecord.PendingDrop d : drops) {
             if (d != null && d.ori != null && !d.ori.isEmpty() && d.count > 0) {
                 out.add(new GameTables.GoodsDrop(d.ori, d.count));
             }

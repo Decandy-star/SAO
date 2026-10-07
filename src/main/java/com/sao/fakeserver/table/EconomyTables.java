@@ -661,6 +661,28 @@ public class EconomyTables {
         return row != null && row.bctAllSaoDang;
     }
 
+    /**
+     * VipCfg col5「开启十连扫荡」：客户端 {@code VipManager.IsOpenShaoDang10Ci}
+     * （{@code NormalFBDescribeSystem.cs:735} 只在十连扫荡时查它）。本仓表 VIP0/VIP1=0、VIP2 起=1。
+     * 无该 VIP 行时按 false（与客户端「没这一档就不给」同向）。
+     */
+    public boolean openShaoDang10Ci(int chargedDiamond) {
+        VipRow row = vip(chargedDiamond);
+        return row != null && row.openShaoDang10Ci;
+    }
+
+    /** VipCfg col7 普通副本重置次数 = 每日买副本次数上限（客户端 {@code VipManager.FBResetMaxCount}）。 */
+    public int fbResetMaxCount(int chargedDiamond) {
+        VipRow row = vip(chargedDiamond);
+        return row == null ? 0 : Math.max(0, row.fbResetMaxCount);
+    }
+
+    /** VipCfg col8 精英副本重置次数 = 每日买副本次数上限（客户端 {@code VipManager.JYFBResetMaxCount}）。 */
+    public int jyFbResetMaxCount(int chargedDiamond) {
+        VipRow row = vip(chargedDiamond);
+        return row == null ? 0 : Math.max(0, row.jyFbResetMaxCount);
+    }
+
     public int buildingChoulao(int type, int level) {
         Integer n = buildingChoulao.get(type + "/" + level);
         return n == null ? 0 : n.intValue();
@@ -1731,6 +1753,9 @@ public class EconomyTables {
             r.santaRate = toFloat(cols, 21);
             r.bctSingleSaoDang = toInt(cols, 32) == 1;
             r.bctAllSaoDang = toInt(cols, 33) == 1;
+            r.openShaoDang10Ci = toInt(cols, 4) == 1;
+            r.fbResetMaxCount = toInt(cols, 6);
+            r.jyFbResetMaxCount = toInt(cols, 7);
             r.riChangHuoDongSaoDang = toInt(cols, 46) == 1;
             if (r.faBiaoCount <= 0) {
                 r.faBiaoCount = 1;
@@ -2070,6 +2095,12 @@ public class EconomyTables {
         public float santaRate = 1f;
         /** VipCfg col46 日常活动扫荡。 */
         public boolean riChangHuoDongSaoDang;
+        /** VipCfg col5 开启十连扫荡（客户端 {@code VipManager.IsOpenShaoDang10Ci}；本仓表 VIP2 起为 1）。 */
+        public boolean openShaoDang10Ci;
+        /** VipCfg col7 普通副本重置次数（客户端 {@code VipManager.FBResetMaxCount}，即买副本次数日上限）。 */
+        public int fbResetMaxCount;
+        /** VipCfg col8 精英副本重置次数（客户端 {@code VipManager.JYFBResetMaxCount}）。 */
+        public int jyFbResetMaxCount;
         /** VipCfg col32/33 百层塔单扫 / 一键扫荡。 */
         public boolean bctSingleSaoDang;
         public boolean bctAllSaoDang;

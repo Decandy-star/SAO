@@ -43,6 +43,8 @@ public class GameTables {
             "KuaFuZhanPrize.txt",
             "KuaFuZhanBase.txt",
             "RegionList.txt",
+            "ChapterList.txt",
+            "GlobalSetup_CH.txt",
             "HundredTowerList.txt",
             "HundredTowerCommon.txt",
             "ResourceFBData.txt",
@@ -50,6 +52,8 @@ public class GameTables {
     };
 
     private final SaoProperties props;
+    /** GameText 切片的懒加载缓存（{@link #readTable} 的兜底数据源）。 */
+    private GameTextLoader gameTextCache;
     private final Map<Integer, Integer> playerNextExp = new HashMap<>();
     private final Map<Integer, Integer> playerVpOnLevel = new HashMap<>();
     private final Map<Integer, Integer> wjNextExp = new HashMap<>();
@@ -78,6 +82,21 @@ public class GameTables {
     /** RegionList：type → 场景 ID 升序（资源挑战 getAllRegionID[0]）。 */
     private final Map<Integer, List<Integer>> regionIdsByType = new HashMap<>();
     private final Map<Integer, Integer> regionNormalEnergy = new HashMap<>();
+    /** RegionList col7「精英副本消耗的精力值」（col6=普通，见 {@link #regionNormalEnergy}）。 */
+    private final Map<Integer, Integer> regionHardEnergy = new HashMap<>();
+    /** ChapterList：章节 ID → col4「开启等级」（客户端 ChapterProperty.mOpenLevel，前 7 章=1）。 */
+    private final Map<Integer, Integer> chapterOpenLevel = new HashMap<>();
+    /**
+     * GlobalSetup_CH「精英副本开启时普通关卡需要完成的关卡id」（客户端 GlobalSetup 字段 token 66，实表 3010）。
+     * 客户端 ChapterGuanKaCommonInfo.cs:99 用它做 `GuanKaHasPassed(该值*10+1)`，即要求普通进度 ≥ 3010。
+     */
+    private int eliteUnlockRegion = 3010;
+    /** GlobalSetup_CH「扫荡开启关卡」（token 67，实表 2001）。 */
+    private int normalFbOpenSaoDang = 2001;
+    /** GlobalSetup_CH token 77-80「每日第三/六/九/十关普通关卡通关次数上限」（实表各 10）。 */
+    private final Map<Integer, Integer> normalFbPlayLimitByStage = new HashMap<>();
+    /** GlobalSetup_CH token 81-84「每日第三/六/九/十关精英关卡通关次数上限」（实表各 3）。 */
+    private final Map<Integer, Integer> jyFbPlayLimitByStage = new HashMap<>();
     private final Map<Integer, BctLayer> bctByLayer = new HashMap<>();
     private final Map<Integer, ResourceFbLevelCfg> resourceFbLevel = new HashMap<>();
     private BctCommon bctCommon = new BctCommon();
@@ -110,6 +129,8 @@ public class GameTables {
         parseKfzPrize(readTable(dir, "KuaFuZhanPrize.txt"));
         parseKfzBase(readTable(dir, "KuaFuZhanBase.txt"));
         parseRegionList(readTable(dir, "RegionList.txt"));
+        parseChapterList(readTable(dir, "ChapterList.txt"));
+        parseGlobalSetup(readTable(dir, "GlobalSetup_CH.txt"));
         parseHundredTower(readTable(dir, "HundredTowerList.txt"));
         parseHundredTowerCommon(readTable(dir, "HundredTowerCommon.txt"));
         parseResourceFbData(readTable(dir, "ResourceFBData.txt"));
@@ -226,6 +247,61 @@ public class GameTables {
     public int regionNormalEnergy(int regionId) {
         Integer e = regionNormalEnergy.get(Integer.valueOf(regionId));
         return e == null ? 0 : e.intValue();
+    }
+
+    /**
+     * 该场景的体力消耗：难度 2（精英）取 RegionList col7，其余取 col6（普通）。
+     * 客户端 {@code NormalFBDescribeSystem.cs:788-796} 即按 {@code mNormalCostEnery}/{@code mHardCostEnery} 分支。
+     */
+    public int regionEnergy(int regionId, int diffCode) {
+        Map<Integer, Integer> m = diffCode == 2 ? regionHardEnergy : regionNormalEnergy;
+        Integer e = m.get(Integer.valueOf(regionId));
+        return e == null ? 0 : e.intValue();
+    }
+
+    /** ChapterList 该章的开启等级（客户端 {@code ChapterProperty.mOpenLevel}）；无行返回 0（不拦）。 */
+    public int chapterOpenLevel(int chapter) {
+        Integer lv = chapterOpenLevel.get(Integer.valueOf(chapter));
+        return lv == null ? 0 : lv.intValue();
+    }
+
+    /** ChapterList 章节总数（客户端 {@code ChapterPropertyMgr.GetChapterCount()}，实表 28）；0 = 表没读到。 */
+    public int chapterCount() {
+        int max = 0;
+        for (Integer c : chapterOpenLevel.keySet()) {
+            if (c != null && c.intValue() > max) {
+                max = c.intValue();
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 主线门槛表是否可用。RegionList 一行都没读到（表缺失/抽取失败）时调用方应当**不拦**，
+     * 否则一次读表失败会把所有进本/扫荡全部砖掉；拦错比放过更伤。
+     */
+    public boolean mainFbGatesAvailable() {
+        return !regionNormalEnergy.isEmpty();
+    }
+
+    /** 精英本总开关：普通进度须 ≥ 该关卡（GlobalSetup_CH token66，实表 3010）。 */
+    public int eliteUnlockRegion() {
+        return eliteUnlockRegion;
+    }
+
+    /** 扫荡开启关：普通进度须 ≥ 该关才开扫荡（GlobalSetup_CH token67，实表 2001）。 */
+    public int normalFbOpenSaoDang() {
+        return normalFbOpenSaoDang;
+    }
+
+    /**
+     * 每日通关次数上限：GlobalSetup_CH 每日第三/六/九/十关（普通 token77-80 / 精英 token81-84）。
+     * 非 3/6/9/10 关返回 0 —— 与客户端 {@code FBStarInfo.cs:20-38}（其他关号 MaxPlayTime=0）一致。
+     */
+    public int mainFbPlayLimit(int diffCode, int stageInChapter) {
+        Map<Integer, Integer> m = diffCode == 2 ? jyFbPlayLimitByStage : normalFbPlayLimitByStage;
+        Integer v = m.get(Integer.valueOf(stageInChapter));
+        return v == null ? 0 : v.intValue();
     }
 
     /**
@@ -491,6 +567,13 @@ public class GameTables {
                 missing.add(name);
             }
         }
+        // ChapterList.txt 在 GameText 里有两份，早期版本可能已把 610B 的文案名表抽到 tables/；
+        // 这里按「必须含表头开启等级」重新校验，不合格就重抽（走 getFirst）。
+        String chapterList = readTable(dir, "ChapterList.txt");
+        if (chapterList != null && !chapterList.contains("开启等级") && !missing.contains("ChapterList.txt")) {
+            log.warn("tables/ChapterList.txt looks like the 610B name list; re-extracting the real table");
+            missing.add("ChapterList.txt");
+        }
         if (missing.isEmpty()) {
             return;
         }
@@ -500,7 +583,8 @@ public class GameTables {
             return;
         }
         for (String name : missing) {
-            String text = loader.get(name);
+            // 同名多份的表（ChapterList.txt）必须取清单里靠前的那份真表，否则抽到文案表。
+            String text = "ChapterList.txt".equals(name) ? loader.getFirst(name) : loader.get(name);
             if (text == null) {
                 continue;
             }
@@ -513,17 +597,49 @@ public class GameTables {
         }
     }
 
-    private static String readTable(Path dir, String name) {
+    /**
+     * 读表，三级兜底：{@code tables/<name>} → GameText 流水线的可编辑表
+     * （{@code gametext/work/Client/GameText/GameData/<name>}，与
+     * {@code GameTextBuildService.java:81} 同布局）→ GameText 容器切片。
+     * <p>加中间这级是因为 Unity 工程里那份 {@code ../Assets/Resources/GameText.txt} 的
+     * 清单偏移与自己的 blob 已经对不上（实测 {@code VipCfg.txt} 偏移 2031079 处读到的是
+     * 用户协议文案、{@code ChapterList.txt} 偏移 20387 处读到的是别的数值表），
+     * 直接切出来是垃圾；流水线抽出来的单表目录才是可信来源。</p>
+     * <p>同名多份（{@code ChapterList.txt}）一律取清单里靠前的那份，见
+     * {@link GameTextLoader#getFirst(String)}。</p>
+     */
+    private String readTable(Path dir, String name) {
         Path file = dir.resolve(name);
-        if (!Files.isRegularFile(file)) {
-            return null;
+        if (Files.isRegularFile(file)) {
+            try {
+                return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                log.warn("read {} failed: {}", name, e.toString());
+            }
         }
-        try {
-            return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            log.warn("read {} failed: {}", name, e.toString());
-            return null;
+        Path pipeline = Paths.get(props.getGametextDir())
+                .resolve("work").resolve("Client").resolve("GameText").resolve("GameData").resolve(name);
+        if (Files.isRegularFile(pipeline)) {
+            try {
+                log.info("tables/{} unavailable; using {}", name, pipeline);
+                return new String(Files.readAllBytes(pipeline), StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                log.warn("read {} failed: {}", pipeline, e.toString());
+            }
         }
+        GameTextLoader loader = gameText();
+        String text = "ChapterList.txt".equals(name) ? loader.getFirst(name) : loader.get(name);
+        if (text != null) {
+            log.info("tables/{} unavailable; using GameText slice", name);
+        }
+        return text;
+    }
+
+    private GameTextLoader gameText() {
+        if (gameTextCache == null) {
+            gameTextCache = GameTextLoader.load(props.getGameText());
+        }
+        return gameTextCache;
     }
 
     private void parseRobots(String text) {
@@ -1175,6 +1291,7 @@ public class GameTables {
     private void parseRegionList(String text) {
         regionIdsByType.clear();
         regionNormalEnergy.clear();
+        regionHardEnergy.clear();
         if (text == null) {
             return;
         }
@@ -1185,10 +1302,12 @@ public class GameTables {
             int id = toInt(cols, 1);
             int type = toInt(cols, 3);
             int energy = toInt(cols, 5);
+            int hardEnergy = toInt(cols, 6);
             if (id <= 0) {
                 continue;
             }
             regionNormalEnergy.put(Integer.valueOf(id), Integer.valueOf(energy));
+            regionHardEnergy.put(Integer.valueOf(id), Integer.valueOf(hardEnergy > 0 ? hardEnergy : energy));
             List<Integer> list = regionIdsByType.get(Integer.valueOf(type));
             if (list == null) {
                 list = new ArrayList<>();
@@ -1198,6 +1317,80 @@ public class GameTables {
         }
         for (List<Integer> list : regionIdsByType.values()) {
             Collections.sort(list);
+        }
+    }
+
+    /**
+     * ChapterList：章节 ID → col4「开启等级」（客户端 {@code ChapterProperty.mOpenLevel}，
+     * {@code ChapterController.cs:553} 用它判断能否进下一章；前 7 章=1、第 8 章=18、第 9 章=23…第 28 章=80）。
+     * <p>GameText 清单里 ChapterList.txt 有两份，真表是**靠前**那份（801B），靠后那份 610B 是文案名表
+     * （形如 {@code 1000001 重置之谜}），所以抽取时必须走 {@link GameTextLoader#getFirst(String)}，
+     * 否则拿到的是文案表、这里会一行都解析不出来。</p>
+     */
+    private void parseChapterList(String text) {
+        chapterOpenLevel.clear();
+        if (text == null) {
+            return;
+        }
+        for (String[] cols : hashRows(text)) {
+            if (cols.length < 4) {
+                continue;
+            }
+            int chapter = toInt(cols, 1);
+            int level = toInt(cols, 3);
+            if (chapter <= 0) {
+                continue;
+            }
+            chapterOpenLevel.put(Integer.valueOf(chapter), Integer.valueOf(level));
+        }
+    }
+
+    /**
+     * GlobalSetup_CH：先按客户端 {@code GlobalSetup.cs:38-48} 的方式把整表摊平成 117 项 token
+     * （逐行按空格/TAB 切分、跳过每行第 0 项、其余顺次 append），再取本假服要用的几项：
+     * <ul>
+     *   <li>token 66 {@code mNormalGuanKaProgressInDifficultGuanKaOpen} = 3010（精英本总开关）</li>
+     *   <li>token 67 {@code mNormalFBOpenSaoDang} = 2001（扫荡开启关）</li>
+     *   <li>token 77-80 每日第三/六/九/十关**普通**通关次数上限（实表 10/10/10/10）</li>
+     *   <li>token 81-84 每日第三/六/九/十关**精英**通关次数上限（实表 3/3/3/3）</li>
+     * </ul>
+     * 只能按位置读、不能按标签读：客户端只认位置，且表里 line 40/41「大厅摄像机 Position/Rotation」
+     * 每行贡献 3 个 token，标签行号与数组下标并不一一对应（113 行 → 117 项）。
+     */
+    private void parseGlobalSetup(String text) {
+        eliteUnlockRegion = 3010;
+        normalFbOpenSaoDang = 2001;
+        normalFbPlayLimitByStage.clear();
+        jyFbPlayLimitByStage.clear();
+        if (text == null) {
+            return;
+        }
+        List<String> tokens = new ArrayList<>();
+        for (String line : text.split("\r?\n")) {
+            String[] parts = line.trim().split("[ \\t]+");
+            for (int i = 1; i < parts.length; i++) {
+                if (!parts[i].isEmpty()) {
+                    tokens.add(parts[i]);
+                }
+            }
+        }
+        eliteUnlockRegion = tokenInt(tokens, 66, eliteUnlockRegion);
+        normalFbOpenSaoDang = tokenInt(tokens, 67, normalFbOpenSaoDang);
+        int[] stages = {3, 6, 9, 10};
+        for (int i = 0; i < stages.length; i++) {
+            normalFbPlayLimitByStage.put(Integer.valueOf(stages[i]), Integer.valueOf(tokenInt(tokens, 77 + i, 0)));
+            jyFbPlayLimitByStage.put(Integer.valueOf(stages[i]), Integer.valueOf(tokenInt(tokens, 81 + i, 0)));
+        }
+    }
+
+    private static int tokenInt(List<String> tokens, int index, int fallback) {
+        if (index < 0 || index >= tokens.size()) {
+            return fallback;
+        }
+        try {
+            return Integer.parseInt(tokens.get(index).trim());
+        } catch (NumberFormatException e) {
+            return fallback;
         }
     }
 
@@ -1731,9 +1924,24 @@ public class GameTables {
         }
 
         public List<GoodsDrop> roll(Random rng, boolean firstClear) {
+            return roll(rng, firstClear, null);
+        }
+
+        /**
+         * @param certainOut 只装「首通必掉」那几件（仅 {@code firstClear} 时有内容）。
+         *   客户端 {@code NormalFBGoodsGrant.RefreshView}（PVEZhanDouJieSuan 结算面板）与
+         *   {@code DropGoodsManager.FillDropPool}（局内掉落池）在「该关还没通关」时，会自己按
+         *   {@code RegionDropList} 表的 CertainDropGoods1..3 再加一遍；所以下发 401
+         *   （{@code CCSMsgFBInfo.dropGoods}）的展示列表必须把首通必掉扣掉，否则面板/掉落池会翻倍。
+         *   **奖仍按整份发**（发放用 {@link DungeonService#applyWin} 走 pending.drops）。
+         */
+        public List<GoodsDrop> roll(Random rng, boolean firstClear, List<GoodsDrop> certainOut) {
             List<GoodsDrop> out = new ArrayList<>();
             if (firstClear) {
                 out.addAll(certain);
+                if (certainOut != null) {
+                    certainOut.addAll(certain);
+                }
             }
             int scale = 100;
             for (RandDrop d : random) {

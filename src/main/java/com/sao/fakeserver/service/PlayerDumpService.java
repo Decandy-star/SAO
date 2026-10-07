@@ -53,6 +53,19 @@ public class PlayerDumpService {
     public static final String JIBAN_REFRESH_ITEM_ORI = "PY001";
     public static final int[] JIBAN_REFRESH_ITEM_COST = {10, 20, 40};
     public static final int[] JIBAN_REFRESH_ZUANSHI_COST = {10, 20, 40};
+    /**
+     * detail 18/19：资源挑战（镜像/不可触/致命/圣诞/镰刀）扫荡门槛。客户端
+     * {@code TiaoZhanNanDu.ConfirmDiffulty}（TiaoZhanNanDu.cs:582-616）按 requireType 选门：
+     * 0 = 只看 VipCfg 第 46 列「日常活动扫荡」（现网该列整列 0 ⇒ 扫荡永远被锁，提示「需要VIP0」）；
+     * 1 = 只看账号等级 ≥ LevelRequire；2 = 两者都要。
+     * <p>旧版假服只发 19 不发 18 ⇒ 客户端落回默认 0（VIP 门），镜像/资源本扫荡点了没反应。
+     * 原服真值未知（{@code docs/PROTOCOL_FIELD_AUDIT.md} 第 18 行记为「待真服」）；假服取
+     * requireType=1 + LevelRequire=1 ⇒ 任何等级都能扫。<b>改这里必须同步
+     * {@code DungeonService#resourceFbSaoDangAllowed}。</b>
+     */
+    public static final int RESOURCE_FB_SAO_DANG_REQUIRE_TYPE = 1;
+    /** detail 19（客户端字段初值 1U；缺会被盖成 0）。 */
+    public static final int RESOURCE_FB_SAO_DANG_LEVEL_REQUIRE = 1;
     private static final int BUDDIES_SLOTS = 10;
 
     private final SaoProperties props;
@@ -230,8 +243,12 @@ public class PlayerDumpService {
         Pb.bool(out, 84, true);
         // 78=EquipSoulEnableLevel ← GlobalSetup_CH「器魂开启等级」40；缺=0 则 QiHun 按 0 级可进
         Pb.int32(out, 78, 40);
+        // 18/19 = ResourceFBSaoDang{RequireType,LevelRequire}（CMsgDetailPlayerInfo ProtoMember 18/19）：
+        // **两个都要发**。18 缺 ⇒ 客户端按 0 走「只认 VipCfg 第 46 列」的 VIP 门，而该列现网全是 0，
+        // 于是镜像/资源本扫荡永远提示「需要VIP0」，服务端同口径也会静默拒绝（只回 450）。
+        Pb.int32(out, 18, RESOURCE_FB_SAO_DANG_REQUIRE_TYPE);
         // 19=ResourceFBSaoDangLevelRequire ← 客户端字段初值 1U；缺会被盖成 0
-        Pb.int32(out, 19, 1);
+        Pb.int32(out, 19, RESOURCE_FB_SAO_DANG_LEVEL_REQUIRE);
         Pb.int32(out, 87, rec.moFaChen);
         // 88/89/90 克隆：ChallengeEntryUI 读 Attribute（登录包），不是 GlobalSetup 单例。
         // GlobalSetup_CH：开启等级=25、人数要求=2。客户端字段初值 35/1 会被本包覆盖。
@@ -707,7 +724,16 @@ public class PlayerDumpService {
                 || stageInChapter == 9 || stageInChapter == 10;
     }
 
-    public static int mainFbPlayMax(int diffCode) {
+    /**
+     * 该关每日通关次数上限：{@code GlobalSetup_CH} token77-80（普通 10）/81-84（精英 3），
+     * 对齐客户端 {@code FBStarInfo.cs:20-38 MaxPlayTime}（章内关号 3/6/9/10，其他关号 0 = 不限次）。
+     * <p>表没读到就退回 3/10（老行为）：**不能**返回 0，否则受限关 playLeft=0、客户端直接卡「次数不足」。</p>
+     */
+    public int mainFbPlayMax(int diffCode, int regionId) {
+        int fromTable = tables.mainFbPlayLimit(diffCode, Math.abs(regionId) % 100);
+        if (fromTable > 0) {
+            return fromTable;
+        }
         return diffCode == 2 ? 3 : 10;
     }
 
@@ -719,7 +745,7 @@ public class PlayerDumpService {
         PlayerRecord.StagePlayLimit lim = rec.progress.stagePlayLimits.get(stageKey);
         if (lim == null) {
             lim = new PlayerRecord.StagePlayLimit();
-            lim.playLeft = mainFbPlayMax(diffCode);
+            lim.playLeft = mainFbPlayMax(diffCode, regionId);
             lim.buyTimes = 0;
             rec.progress.stagePlayLimits.put(stageKey, lim);
         }

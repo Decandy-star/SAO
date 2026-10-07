@@ -23,6 +23,13 @@ public final class GameTextLoader {
             "<File\\s+Name=\"([^\"]+)\"\\s+StartPos=\"(\\d+)\"\\s+Length=\"(\\d+)\"");
 
     private final Map<String, String> files = new LinkedHashMap<>();
+    /**
+     * 同名切片里**第一次**出现的那份。GameText 清单存在同名项，例如 {@code ChapterList.txt} 出现两次：
+     * 20387/801B 是真表（章节ID/名称/开启等级，客户端 {@code ChapterPropertyMgr} 按
+     * {@code GameData/ChapterList.txt} 取到的就是它），8696056/610B 是 StrTable 文案源（2 列）。
+     * {@link #files} 后写覆盖先写 ⇒ 只能拿到 610B 那份，故真表必须走 {@link #getFirst(String)}。
+     */
+    private final Map<String, String> firstFiles = new LinkedHashMap<>();
 
     public static GameTextLoader load(String configuredPath) {
         Path path = resolve(configuredPath);
@@ -53,6 +60,20 @@ public final class GameTextLoader {
         return null;
     }
 
+    /** 同名切片取清单里**靠前**的那份（见 {@link #firstFiles}）；没有同名冲突时与 {@link #get(String)} 等价。 */
+    public String getFirst(String name) {
+        String text = firstFiles.get(name);
+        if (text != null) {
+            return text;
+        }
+        for (Map.Entry<String, String> e : firstFiles.entrySet()) {
+            if (e.getKey().equalsIgnoreCase(name) || e.getKey().endsWith("/" + name) || e.getKey().endsWith("\\" + name)) {
+                return e.getValue();
+            }
+        }
+        return get(name);
+    }
+
     public boolean isEmpty() {
         return files.isEmpty();
     }
@@ -81,7 +102,11 @@ public final class GameTextLoader {
                 log.warn("slice {} out of range", name);
                 continue;
             }
-            files.put(name, new String(all, from, length, StandardCharsets.UTF_8));
+            String slice = new String(all, from, length, StandardCharsets.UTF_8);
+            files.put(name, slice);
+            if (!firstFiles.containsKey(name)) {
+                firstFiles.put(name, slice);
+            }
         }
     }
 

@@ -75,4 +75,62 @@ class GameTablesTest {
         }
         assertTrue(tables.draw().jbOnce > 0);
     }
+
+    /**
+     * 主线进本/扫荡要用的三张表：RegionList（体力）、ChapterList（章节开启等级）、
+     * GlobalSetup_CH（精英总开关/扫荡开启关/每日次数上限）。值取实表（UTF-8 + TAB）。
+     */
+    @Test
+    void mainFbGatesComeFromChapterAndGlobalSetupTables() {
+        Path dir = Paths.get("tables");
+        if (!Files.isRegularFile(dir.resolve("RegionList.txt"))) {
+            return;
+        }
+        SaoProperties props = new SaoProperties();
+        props.setTablesDir(dir.toString());
+        props.setGameText("../Assets/Resources/GameText.txt");
+        GameTables tables = new GameTables(props);
+        tables.init();
+        // RegionList：col6 普通 / col7 精英（1003 = 1-3，实表 8 / 16）
+        assertEquals(8, tables.regionEnergy(1003, 1));
+        assertEquals(16, tables.regionEnergy(1003, 2));
+        // ChapterList：前 7 章开启等级 1，第 8 章 18 … 第 28 章 80（共 28 章）
+        assertEquals(1, tables.chapterOpenLevel(1));
+        assertEquals(1, tables.chapterOpenLevel(7));
+        assertEquals(18, tables.chapterOpenLevel(8));
+        assertEquals(80, tables.chapterOpenLevel(28));
+        // GlobalSetup_CH：token66 精英总开关、token67 扫荡开启关
+        assertEquals(3010, tables.eliteUnlockRegion());
+        assertEquals(2001, tables.normalFbOpenSaoDang());
+        // 每日次数上限：第三/六/九/十关（普通 10、精英 3），其他关号 0
+        assertEquals(10, tables.mainFbPlayLimit(1, 3));
+        assertEquals(10, tables.mainFbPlayLimit(1, 10));
+        assertEquals(3, tables.mainFbPlayLimit(2, 3));
+        assertEquals(3, tables.mainFbPlayLimit(2, 10));
+        assertEquals(0, tables.mainFbPlayLimit(1, 1));
+    }
+
+    /** VipCfg：十连扫荡门（col5）与买副本次数上限（col7/col8，普通/精英）。 */
+    @Test
+    void vipSweepAndResetLimitsComeFromVipCfg() {
+        Path dir = Paths.get("tables");
+        if (!Files.isRegularFile(dir.resolve("VipCfg.txt"))) {
+            return;
+        }
+        SaoProperties props = new SaoProperties();
+        props.setTablesDir(dir.toString());
+        EconomyTables economy = new EconomyTables(props);
+        economy.init();
+        // 本仓表：VIP0/VIP1 不给十连扫荡，VIP2 起给（vip() 按累计钻石取档：VIP1=60、VIP2=300）
+        assertFalse(economy.openShaoDang10Ci(0));
+        assertFalse(economy.openShaoDang10Ci(60));
+        assertTrue(economy.openShaoDang10Ci(300));
+        // 买副本次数日上限：VIP0=0/0、VIP1=1/1、VIP2=2/2
+        assertEquals(0, economy.fbResetMaxCount(0));
+        assertEquals(0, economy.jyFbResetMaxCount(0));
+        assertEquals(1, economy.fbResetMaxCount(60));
+        assertEquals(1, economy.jyFbResetMaxCount(60));
+        assertEquals(2, economy.fbResetMaxCount(300));
+        assertEquals(2, economy.jyFbResetMaxCount(300));
+    }
 }

@@ -883,7 +883,21 @@ public class PlayerRecord {
         public int wjExp;
         public int wnsp;
         public int yingPo;
+        /** 发放用：含首通必掉（certain）那份。 */
         public List<PendingDrop> drops = new ArrayList<>();
+        /**
+         * 下发 401 用：**已扣掉首通必掉**，因为客户端在未通关时会自己再加一遍
+         * （{@code NormalFBGoodsGrant.cs:174-268}、{@code DropGoodsManager.cs:215-236}）。
+         */
+        public List<PendingDrop> displayDrops = new ArrayList<>();
+        /** 401 field5/6 用；{@code wnsp - firstWnspCount} / {@code yingPo - firstYingPoCount}。 */
+        public int displayWnsp;
+        public int displayYingPo;
+        /**
+         * {@code display*} 是否已按「扣掉首通必掉」算过。旧档（无此字段）为 false ⇒ 展示退回
+         * {@link #drops} 全量 = 老行为，不会因为升级假服而把旧 pending 判成空。
+         */
+        public boolean displaySplit;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
