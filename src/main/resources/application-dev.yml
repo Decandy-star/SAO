@@ -1,0 +1,85 @@
+# 本地联调档（dev）：`--spring.profiles.active=dev`（IDEA 里设 VM/环境变量 spring.profiles.active=dev）
+#
+# 本文件 = application.yml 的副本，只改一处：sao.public-ip -> 127.0.0.1。
+# 影响面（全 Java 树只有 4 处读 getPublicIp）：
+#   http/QfXmlController.java:27    动态选服 /QF.xml 里的 IP=
+#   http/VersionController.java:39  动态版本 /Version/Version.bytes 六段里的主机
+#   netty/GameTcpServer.java:64     启动日志一行
+#   service/GameTextBuildService.java:79  /admin 状态页显示的 publishUrlPrefix（不写进 AB）
+# ⇒ 用 dev 启动时，这两个动态接口报的都是 127.0.0.1；配合 adb reverse（8080 + 12345）真机/模拟器可直连。
+#   非 dev 启动仍用 application.yml 里的 192.168.5.3（局域网联调）。
+#
+# 注意：这是完整副本，改 application.yml 时记得同步这里。
+
+server:
+  port: 8080
+
+# 日志级别由 sao.log-level 单点控制（下面 sao: 段里）。
+# 本地开发 INFO（要细看改 DEBUG）；上云改成 WARN 或 OFF，仅排错时临时打开。
+# 方案与命令见 docs/CLOUD_RELEASE.md「日志级别：上云默认关，排错才开」。
+logging:
+  level:
+    root: ${sao.log-level:INFO}
+    com.sao.fakeserver: ${sao.log-level:INFO}
+  # 控制台照常；额外落到 logs/sao-fake-server.log（相对进程 CWD，IDEA 一般为模块根）
+  file:
+    name: logs/sao-fake-server.log
+  logback:
+    rollingpolicy:
+      max-file-size: 64MB
+      max-history: 14
+
+sao:
+  # 日志总开关：本地 INFO（可 DEBUG）；上云 WARN（只留警告）或 OFF（全静默）。
+  # 也可不改文件、用环境变量临时覆盖：SAO_LOG_LEVEL=DEBUG
+  # （systemd 永久/临时覆盖见 docs/CLOUD_RELEASE.md「日志级别」）
+  log-level: INFO
+  # 游戏 TCP（客户端 QF.xml 的 Port）
+  game-port: 12345
+  # 写进 QF.xml 的 IP。dev = 本地回环：客户端必须经 adb reverse 才能连上（见 apk-pipeline-local/README_LOCAL.md）
+  public-ip: 127.0.0.1
+  server-id: "1"
+  server-name: "圣母圣咏"
+  data-dir: ./data/players
+  world-dir: ./data/world
+  # 结算表（已从 GameText 抽出）。搬家只带 sao-fake-server 即可。
+  tables-dir: ./tables
+  # GameText 切分/合并/打 AB（见 gametext/README.md）
+  gametext-dir: ./gametext
+  python-exe: python
+  unity-exe: F:\Unity 4.6.6f2\Editor\Unity.exe
+  unity-project: ..
+  # 仅当 tables 缺文件时才回头读 Unity 工程里的 GameText.txt
+  game-text: ../Assets/Resources/GameText.txt
+  # false=无档走创角（选左右角色+命名）；true=首次登录直接发号跳过创角
+  auto-create-role: false
+  init-rmb: 5000
+  # 对齐 GameText JJC_Common.txt「每日竞技场免费挑战次数=5」
+  jjc-daily-times: 5
+  default-wujiang-index: 18
+  # 右侧初始武将：闪光骑士(19)，须与 CreateRoleSetup.txt / NewUserFB_WjAttriCfg 一致
+  alt-wujiang-index: 19
+  main-city-region-id: 1
+  # GameData/RegionLogic/1_gk.xml <BornBos>（大厅）
+  born-x: -1.12
+  born-y: 301.52
+  born-z: 15.42
+  init-serial: 15
+  dungeon-player-exp: 80
+  dungeon-wujiang-exp: 60
+  dungeon-gold: 500
+  dungeon-vp-cost: 6
+  drop-ori-name: "SP048"
+  drop-count: 1
+  # 校验密码；login-account 是账号白名单（逗号分隔多个，`*` = 不限账号，只校验密码）
+  enforce-login: true
+  login-account: "*"
+  login-password: "1"
+  # 全服开服时间（yyyy-MM-dd HH:mm:ss）。留空 = 首次启动写入 data/world/server.json 并长期沿用。
+  # 7 日狂欢 / 半月庆典等「开服第 N 天」玩法以它为准（不再按各账号 createdAt 各算一套）。
+  open-server-time: ""
+  # /admin/* 鉴权（不改 APK）。空=拒绝全部 admin。生产请自行重新生成后替换。
+  # 生成见 docs/ADMIN.md「生成新 token」
+  admin-token: "sao_adm_7Kq2mR9xVpL4nW8cHj3TsY6uBf1GdAe0"
+  # KFZ 捏造类真人数量（启动补齐 npc_kfz_0001..）；单号约 20–50KB
+  kfz-npc-count: 800
