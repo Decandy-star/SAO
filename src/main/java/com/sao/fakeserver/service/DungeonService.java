@@ -501,6 +501,30 @@ public class DungeonService {
         return Math.min(lim.playLeft, byStamina);
     }
 
+    /**
+     * 本场战斗的「上阵 5 人」：主线普本/扫荡用 PVE 阵容（客户端 {@code EmBattleSystem} 的 mType=0 分支，
+     * 走 {@code ChapterGuanKaCommonInfo.GetPuTongLastOpenChapterGuanKaID}），资源本用该玩法的阵容类型
+     * （{@link #RT_MIRROR}/{@link #RT_UNTOUCHABLE}/{@link #RT_DEADLY}/{@link #RT_SANTA}/{@link #RT_SCYTHE}
+     * 与客户端 {@code eFormationType} 同号，即 {@code PlayerRecord.FORMATION_*}）。该类型从未写过时
+     * {@link PlayerRecord#formationSlots(int)} 会回退 PVE 阵容；空槽与找不到的 guid 一律跳过。
+     *
+     * <p>通关的武将经验只发给这 5 人：客户端结算面板（{@code NormalFBGoodsGrant}）只渲染上阵的 5 人，
+     * 发全账号武将会让未上阵的武将也涨经验（用户 m01484 报障）。
+     */
+    private List<PlayerRecord.Hero> deployedHeroes(PlayerRecord rec, int formationType) {
+        List<PlayerRecord.Hero> out = new ArrayList<>(5);
+        for (String guid : rec.formationSlots(formationType)) {
+            if (guid == null || guid.isEmpty()) {
+                continue;
+            }
+            PlayerRecord.Hero hero = rec.findHero(guid);
+            if (hero != null && !out.contains(hero)) {
+                out.add(hero);
+            }
+        }
+        return out;
+    }
+
     private byte[] sweep(GameSession session, GamePacket pkt, PlayerRecord rec, int region, int diff, int times,
                          int vpPerRun, boolean consumeMainLimit, List<GameTables.GoodsDrop> rolledOut) {
         int cost = Math.max(0, vpPerRun) * times;
@@ -513,6 +537,8 @@ public class DungeonService {
         for (int i = 0; i < rec.heroes.size(); i++) {
             wjLeveled.add(Boolean.FALSE);
         }
+        // 武将经验只发给上阵 5 人（未上阵的保留 FALSE，保证 pushWjProgress 下标对齐）
+        List<PlayerRecord.Hero> team = deployedHeroes(rec, PlayerRecord.FORMATION_PVE);
         for (int n = 0; n < times; n++) {
             GameTables.DropRow drop = tables.drop(region, diff);
             int gold = drop != null ? drop.gold : props.getDungeonGold();
@@ -540,7 +566,8 @@ public class DungeonService {
                 newEq.addAll(progress.grantReward(rec, g.ori, g.count, changed));
             }
             for (int i = 0; i < rec.heroes.size(); i++) {
-                if (progress.addWjExp(rec, rec.heroes.get(i), wExp)) {
+                PlayerRecord.Hero wj = rec.heroes.get(i);
+                if (team.contains(wj) && progress.addWjExp(rec, wj, wExp)) {
                     wjLeveled.set(i, Boolean.TRUE);
                 }
             }
@@ -605,9 +632,11 @@ public class DungeonService {
         progress.addWnsp(rec, wnsp);
         progress.addYingPo(rec, ying);
 
+        // 武将经验只发给上阵 5 人（未上阵的填 FALSE，保证 pushWjProgress 下标对齐）
+        List<PlayerRecord.Hero> team = deployedHeroes(rec, PlayerRecord.FORMATION_PVE);
         List<Boolean> wjLeveled = new ArrayList<>();
         for (PlayerRecord.Hero wj : rec.heroes) {
-            wjLeveled.add(progress.addWjExp(rec, wj, wExp));
+            wjLeveled.add(team.contains(wj) && progress.addWjExp(rec, wj, wExp));
         }
         byte[] playTimeUpdate = consumeMainFbPlayTime(rec, region, diff, 1);
         store.save(rec);
@@ -675,9 +704,11 @@ public class DungeonService {
         progress.addWnsp(rec, wnsp);
         progress.addYingPo(rec, ying);
 
+        // 武将经验只发给该玩法上阵的 5 人（资源本阵容类型 = 客户端 eFormationType 同号）
+        List<PlayerRecord.Hero> team = deployedHeroes(rec, regionType);
         List<Boolean> wjLeveled = new ArrayList<>();
         for (PlayerRecord.Hero wj : rec.heroes) {
-            wjLeveled.add(progress.addWjExp(rec, wj, wExp));
+            wjLeveled.add(team.contains(wj) && progress.addWjExp(rec, wj, wExp));
         }
         store.save(rec);
 
